@@ -69,7 +69,8 @@ else :
         print("volume : %s%%" % response['result']['volume']['percent'])
                                                                  # search for id
 if search_for_id :
-    print('Searching for client id')
+    if verbose :
+        print('Searching for client id')
     client_name = client_id
     client_id = ''
                                                                     # set method
