@@ -55,6 +55,8 @@ payload['method'] = 'Client.SetVolume'
 parameters = {}
 parameters['id'] = client_id
 parameters['volume'] = {'muted':False, 'percent':volume}
+if volume == 0 :
+    parameters['volume'] = {'muted':True}
 payload['params'] = parameters
                                                                   # send request
 response = requests.post(url, data=json.dumps(payload)).json()
