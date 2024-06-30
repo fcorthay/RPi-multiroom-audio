@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+# multiroom environment
+export MULTIROOM_SNAPCAST_SERVER='Persephone.local'
+
 # from installation
 export AMPLIFIER_SOUNDCARD=sndrpijustboomd
 export AUDIO_FORMAT=S24_LE
