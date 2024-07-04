@@ -13,7 +13,7 @@ INDENT = 2*' '
 #
                                                              # specify arguments
 parser = argparse.ArgumentParser(
-  description='get snapserver status'
+  description='set snapclient volume'
 )
                                                                 # snap client id
 parser.add_argument('client')
