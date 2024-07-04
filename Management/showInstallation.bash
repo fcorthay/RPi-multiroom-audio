@@ -13,7 +13,7 @@ if [ -z "$serviceExists" ] ; then
 else
   serviceActivity=`service $service status | grep -E "^ +Active"`
   serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
-  serviceActivity=`echo $serviceActivity | tr ')' ':' | sed 's/:.*/)/'`
+  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
   echo "${INDENT}$serviceActivity"
   audioOutput=`cat /etc/mopidy/mopidy.conf | grep ^output | sed 's/.*device=//'`
   echo "${INDENT}files -> mopidy -> $audioOutput"
@@ -27,7 +27,7 @@ if [ -z "$serviceExists" ] ; then
 else
   serviceActivity=`service $service status | grep -E "^ +Active"`
   serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
-  serviceActivity=`echo $serviceActivity | tr ')' ':' | sed 's/:.*/)/'`
+  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
   echo "${INDENT}$serviceActivity"
   audioInput=`cat /etc/snapserver.conf | grep ^source | sed 's/source\s*=\s*//'`
   if [[ "$audioInput" =~ ^alsa.* ]]; then
@@ -44,11 +44,15 @@ if [ -z "$serviceExists" ] ; then
 else
   serviceActivity=`service $service status | grep -E "^ +Active"`
   serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
-  serviceActivity=`echo $serviceActivity | tr ')' ':' | sed 's/:.*/)/'`
+  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
   echo "${INDENT}$serviceActivity"
+  audioInput=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
+  audioInput=`echo $audioInput | sed 's/.*--host\s*//'`
+  audioInput=`echo $audioInput | sed 's/\s.*//'`
+  audioInput=`echo $audioInput | sed 's/"//'`
   audioOutput=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
   audioOutput=`echo $audioOutput | sed 's/.*--soundcard\s*//'`
   audioOutput=`echo $audioOutput | sed 's/\s.*//'`
   audioOutput=`echo $audioOutput | sed 's/"//'`
-  echo "${INDENT}Ethernet -> snapclient -> $audioOutput"
+  echo "${INDENT}$audioInput -> snapclient -> $audioOutput"
 fi
