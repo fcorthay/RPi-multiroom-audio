@@ -51,6 +51,11 @@ parser.add_argument(
     '-d', '--duration', default=0,
     help = 'notes duration'
 )
+                                                                # notes interval
+parser.add_argument(
+    '-i', '--interval', default=0,
+    help = 'notes interval'
+)
                                                                 # verbose output
 parser.add_argument(
     '-v', '--verbose', action='store_true',
@@ -64,6 +69,7 @@ end_octave = int(parser_arguments.end)
 use_white_octave = parser_arguments.white
 sampling_rate = float(parser_arguments.rate)
 notes_duration = float(parser_arguments.duration)
+notes_interval = float(parser_arguments.interval)
 verbose = parser_arguments.verbose
 
 script_directory = os.path.dirname(os.path.realpath(__file__))
@@ -95,27 +101,43 @@ def build_note_waveform(note, duration=0.5, amplitude=2**15-1):
     tone_frequency = note_frequency(note)
     if verbose :
         print(INDENT + "frequency : %.3f" % tone_frequency)
-    tone_period = 1.0/tone_frequency
-    sampling_period = 1.0/sampling_rate
-    sample_nb = int(sampling_rate * duration)
-                                                                     # pure sine
-    tone_period_nb = math.floor(duration/tone_period)
-    tone_duration = tone_period_nb*tone_period
-    tone_sample_nb = int(round(tone_duration / sampling_period))
-    t_sine = np.linspace(0, tone_duration, tone_sample_nb)
-    sine_wave = amplitude * np.sin(2 * np.pi * tone_frequency * t_sine)
+    waveform_sample_nb = round(sampling_rate * duration)
+    t_waveform = np.linspace(0, duration, waveform_sample_nb)
+    period_sample_nb = round(sampling_rate / tone_frequency)
+    period_nb = math.floor(waveform_sample_nb / period_sample_nb)
                                                                        # ramp up
-    ramp_up_sample_nb = (sample_nb-tone_sample_nb) // 2
-    if ramp_up_sample_nb < 1 :
-        ramp_up_sample_nb = 1
-    ramp_up_wave = np.zeros(ramp_up_sample_nb)
+    ramp_up_sample_nb = period_sample_nb // 2
+    t_ramp_up = t_waveform[:ramp_up_sample_nb - 1]
+    ramp_up_wave = 0.5*(1 - np.cos(2 * np.pi * tone_frequency * t_ramp_up))
+                                                                 # standing wave
+    standing_period_nb = period_nb - 1
+    standing_sample_nb = standing_period_nb * period_sample_nb
+    t_standing = t_waveform[
+        ramp_up_sample_nb:ramp_up_sample_nb + standing_sample_nb - 1
+    ]
+    standing_wave = -np.cos(2 * np.pi * tone_frequency * t_standing)
                                                                      # ramp down
-    ramp_down_sample_nb = sample_nb-tone_sample_nb-ramp_up_sample_nb
-    if ramp_down_sample_nb < 1 :
-        ramp_down_sample_nb = 1
-    ramp_down_wave = np.zeros(ramp_down_sample_nb)
+    ramp_down_sample_nb = ramp_up_sample_nb
+    t_ramp_down = t_waveform[
+        ramp_up_sample_nb + standing_sample_nb:
+        ramp_up_sample_nb + standing_sample_nb + ramp_up_sample_nb - 1
+    ]
+    ramp_down_wave = 0.5*(1 - np.cos(2 * np.pi * tone_frequency * t_ramp_down))
+    # while ramp_down_wave[-1] > ramp_down_wave[-2] :
+    if ramp_down_wave[-1] > ramp_down_wave[-2] :
+        ramp_down_wave = ramp_down_wave[:-1]
+        ramp_down_sample_nb = ramp_down_sample_nb - 1
+                                                                         # stuff
+    stuff_sample_nb = waveform_sample_nb - ramp_up_sample_nb \
+        - standing_sample_nb - ramp_down_sample_nb
+    if stuff_sample_nb >= 1 :
+        stuff_wave = np.zeros(stuff_sample_nb)
+    else :
+        stuff_wave = np.array([])
                                                                       # assembly
-    wave = np.concatenate((ramp_up_wave, sine_wave, ramp_down_wave))
+    wave = amplitude * np.concatenate(
+        (ramp_up_wave, standing_wave, ramp_down_wave, stuff_wave)
+    )
 
     return wave
 
@@ -127,7 +149,12 @@ def build_octave_waveform(
     '''
     Builds the waveform for all the notes in one octave
     '''
-                                                                  # white octave
+                                                                      # interval
+    interval_wave = np.array([])
+    if notes_interval > 0 :
+        interval_sample_nb = round(notes_interval * sampling_rate)
+        interval_wave = np.zeros(interval_sample_nb)
+                                                                        # octave
     octave_wave = []
     octave_type = full_octave
     if use_white_octave :
@@ -135,7 +162,7 @@ def build_octave_waveform(
     for note_index in range(len(octave_type)):
         note = octave_type[note_index] + str(octave_index)
         tone_wave = build_note_waveform(note, duration, amplitude)
-        octave_wave = np.concatenate((octave_wave, tone_wave))
+        octave_wave = np.concatenate((octave_wave, tone_wave, interval_wave))
                                                                # add following C
     note = 'C' + str(octave_index+1)
     tone_wave = build_note_waveform(note, duration, amplitude)
@@ -163,4 +190,6 @@ right_wave = left_wave
                                                               # write audio file
 file_spec = "%s-%d-%d.wav" % (base_wav_file_name, start_octave, end_octave)
 octaves_stereo = np.vstack((left_wave, right_wave)).transpose()
+if verbose :
+    print("Writing %s" % file_spec)
 wavfile.write(file_spec, round(sampling_rate), octaves_stereo)

@@ -15,8 +15,8 @@ verbose=false
 arguments='s:vh'
 declare -A longArguments
 longArguments=(["s"]="server" ["v"]="verbose")
-
-usage() {                                 # Function: Print a help message.
+                                                             # show script usage
+usage() {
   echo "Usage: $(basename "$0") [-v|--verbose] server" 1>&2 
   exit
 }
