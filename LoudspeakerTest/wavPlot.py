@@ -95,7 +95,7 @@ if verbose :
     print(INDENT + "sample nb : %s" % len(signal_to_plot))
                                                                           # plot
 if verbose :
-    print("Writing %s" % png_file_spec)
+    print('Plotting')
 plt.figure(1, figsize=FIGURE_SIZE)
 plt.plot(t, signal_to_plot)
 plt.title(plot_title)
@@ -103,5 +103,7 @@ plt.xlabel("time [s]")
 plt.ylabel("amplitude")
 plt.ylim(-2**(SIGNAL_BIT_NB-1), 2**(SIGNAL_BIT_NB-1))
 plt.grid()
+if verbose :
+    print("Writing %s" % png_file_spec)
 plt.savefig(png_file_spec)
 plt.clf()
