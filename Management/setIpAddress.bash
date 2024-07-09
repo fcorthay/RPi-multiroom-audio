@@ -15,8 +15,8 @@ else
                                                                 # set IP address
     echo "Changing IP address to $fixedIpAddress"
     domainPart=$(IFS='.' ; echo "${addressParts[*]:0:3}")
-    sudo nmcli con mod "Wired connection 1" ipv4.method manual
     sudo nmcli con mod "Wired connection 1" ipv4.addresses $fixedIpAddress/24
+    sudo nmcli con mod "Wired connection 1" ipv4.method manual
     sudo nmcli con mod "Wired connection 1" ipv4.gateway $domainPart.1
     sudo nmcli con mod "Wired connection 1" ipv4.dns $domainPart.1
                                                                    # show result
