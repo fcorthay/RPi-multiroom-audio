@@ -9,8 +9,9 @@ INDENT='  '
 # Command line arguments
 #
                                                                 # default values
-snapServer='localhost'
-snapClient='00:00:00:00:00:00'
+mopidyServer='localhost'
+command=''
+context='playback'
 verbose=false
                                                              # specify arguments
 arguments='s:vh'
@@ -34,7 +35,7 @@ fi
                                                                # parse arguments
 while getopts ${arguments} option; do
   case ${option} in
-    s) snapServer="$OPTARG" ;;
+    s) mopidyServer="$OPTARG" ;;
     v) verbose=true ;;
     h) usage ;;
     ?) usage
@@ -43,25 +44,32 @@ done
 shift $((OPTIND-1))
 
 if [ -n "$1" ] ; then
-  snapClient=$@
+  command=`echo $1 | tr '[:upper:]' '[:lower:]'`
+else
+  echo 'No command provided.'
+  exit
+fi
+if [ -n "$2" ] ; then
+  context=$2
 fi
 
 # ------------------------------------------------------------------------------
 # Main script
 #
 if [ $verbose = 'true' ] ; then
-  echo "Removing client \"$snapClient\" from server \"$snapServer\""
+  echo "Setting \"$context\" to \"$command\""
 fi
 
-RPC_START='curl -s -d '\''{"jsonrpc": "2.0", "id": 1, "method": "'
-PARAMETERS_START='", "params": {'
-RPC_END='}}'\'' -H '\''Content-Type: application/json'\'''
-RPC_END=`echo "$RPC_END http://$snapServer:1780/jsonrpc | jq"`
-procedure='Server.DeleteClient'
-parameters="\"id\":\"$snapClient\""
+RPC_START='curl -s -d '\''{"jsonrpc": "2.0", "id": 1, "method": "core.'
+RPC_END='"}'\'' -H '\''Content-Type: application/json'\'''
+RPC_END=`echo "$RPC_END http://$mopidyServer:6680/mopidy/rpc"`
+procedure="$context.$command"
 
-COMMAND="$RPC_START$procedure$PARAMETERS_START$parameters$RPC_END"
+COMMAND="$RPC_START$procedure$RPC_END"
 if [ $verbose = 'true' ] ; then
   echo $COMMAND
+  eval $COMMAND
+  echo
+else
+  eval $COMMAND >/dev/null
 fi
-eval $COMMAND
