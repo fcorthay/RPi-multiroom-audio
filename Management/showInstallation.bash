@@ -11,7 +11,7 @@ serviceExists=`echo $serviceList | grep $service`
 if [ -z "$serviceExists" ] ; then
   echo "${INDENT}service not installed"
 else
-  serviceActivity=`service $service status | grep -E "^ +Active"`
+  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
   serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
   serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
   echo "${INDENT}$serviceActivity"
@@ -25,7 +25,7 @@ serviceExists=`echo $serviceList | grep $service`
 if [ -z "$serviceExists" ] ; then
   echo "${INDENT}service not installed"
 else
-  serviceActivity=`service $service status | grep -E "^ +Active"`
+  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
   serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
   serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
   echo "${INDENT}$serviceActivity"
@@ -42,7 +42,7 @@ serviceExists=`echo $serviceList | grep $service`
 if [ -z "$serviceExists" ] ; then
   echo "${INDENT}service not installed"
 else
-  serviceActivity=`service $service status | grep -E "^ +Active"`
+  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
   serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
   serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
   echo "${INDENT}$serviceActivity"
