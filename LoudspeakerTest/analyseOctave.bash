@@ -9,7 +9,7 @@ INDENT='  '
 # Command line arguments
 #
                                                                 # default values
-octave=3
+octave=4
 noteDuration=0.5
 interval=0.1
 whiteOctave=false
@@ -138,36 +138,40 @@ fi
 # ==============================================================================
 # Main
 #
+scriptDirectory=$(dirname "$0")
+inputFile="$scriptDirectory/octave-$octave-$octave"
+inputFileShort="$scriptDirectory/octave-$octave"
+outputFile="$scriptDirectory/record-$octave"
                                                             # build audio signal
-./buildNoteSet.py -s $octave -e $octave -d $noteDuration -i $interval \
-  $whiteOctaveParam $verboseParam
+$scriptDirectory/buildNoteSet.py -s $octave -e $octave \
+  -d $noteDuration -i $interval $whiteOctaveParam $verboseParam
                                                              # plot audio signal
 if [ $plotInput = true ] ; then
-  ./wavPlot.py $verboseParam -t "octave $octave input"\
-    $verboseParam octave-$octave-$octave.wav
-  mv octave-$octave-$octave.png octave-$octave.png
+  $scriptDirectory/wavPlot.py $verboseParam -t "octave $octave input"\
+    $verboseParam $inputFile.wav
+  mv $inputFile.png $inputFileShort.png
 fi
                                                      # record loudspeaker output
 if [ $verbose = true ] ; then
   arecord -D plughw:$microphone --format S16_LE \
-    --duration $recordDuration record-$octave.wav &
+    --duration $recordDuration $outputFile.wav &
   sleep 0.1
   echo
 else
     arecord -D plughw:$microphone --format S16_LE \
-    --duration $recordDuration record-$octave.wav > /dev/null 2>&1 &
+    --duration $recordDuration $outputFile.wav > /dev/null 2>&1 &
 fi
                                                              # play audio signal
 if [ $verbose = true ] ; then
-  sudo aplay -D dmix:$loudspeaker octave-$octave-$octave.wav
+  sudo aplay -D dmix:$loudspeaker $inputFile.wav
 else
-  sudo aplay -D dmix:$loudspeaker octave-$octave-$octave.wav > /dev/null 2>&1
+  sudo aplay -D dmix:$loudspeaker $inputFile.wav > /dev/null 2>&1
 fi
                                                         # wait for recording end
 sleep $recordWait
                                                        # plot loudspeaker output
-./wavPlot.py -s $recordStart -e $recordEnd -t "octave $octave recording" \
-  $verboseParam record-$octave.wav
+$scriptDirectory/wavPlot.py -s $recordStart -e $recordEnd -t "octave \
+  $octave recording" $verboseParam $outputFile.wav
 if [ $keepRecording = false ] ; then
-  rm record-$octave.wav
+  rm $outputFile.wav
 fi
