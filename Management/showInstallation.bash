@@ -54,5 +54,26 @@ else
   audioOutput=`echo $audioOutput | sed 's/.*--soundcard\s*//'`
   audioOutput=`echo $audioOutput | sed 's/\s.*//'`
   audioOutput=`echo $audioOutput | sed 's/"//'`
-  echo "${INDENT}$audioInput -> snapclient -> $audioOutput"
+  audioOutput=`echo $audioOutput | sed 's/Loopback/Loopback(,0,0)/'`
+  echo "${INDENT}Ethernet $audioInput -> snapclient -> $audioOutput"
+fi
+                                                                    # camilladsp
+echo 'CamillaDSP'
+service='camilladsp'
+serviceExists=`echo $serviceList | grep $service`
+if [ -z "$serviceExists" ] ; then
+  echo "${INDENT}service not installed"
+else
+  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
+  serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
+  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
+  echo "${INDENT}$serviceActivity"
+  audioInput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 capture | grep device`
+  audioInput=`echo $audioInput | sed 's/ *device: "//'`
+  audioInput=`echo $audioInput | sed 's/".*//'`
+  audioOutput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 playback`
+  audioOutput=`echo -e "$audioOutput" | grep device`
+  audioOutput=`echo $audioOutput | sed 's/ *device: "//'`
+  audioOutput=`echo $audioOutput | sed 's/".*//'`
+  echo "${INDENT}$audioInput -> CamillaDSP -> $audioOutput"
 fi
