@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "./static/css/main.56318a83.css",
+    "main.js": "./static/js/main.52aa888c.js",
+    "static/media/camilladsp.svg": "./static/media/camilladsp.4767ea4ad3510467418b818dc677a87e.svg",
+    "index.html": "./index.html",
+    "main.56318a83.css.map": "./static/css/main.56318a83.css.map",
+    "main.52aa888c.js.map": "./static/js/main.52aa888c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.56318a83.css",
+    "static/js/main.52aa888c.js"
+  ]
+}
