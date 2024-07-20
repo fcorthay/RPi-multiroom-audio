@@ -77,9 +77,6 @@ envelope_from_file = wav.read(envelope_file_spec)[1]
 sampling_period = 1.0/sampling_rate
 sample_nb = len(signal_from_file)
 t = np.linspace(0, (sample_nb-1)*sampling_period, sample_nb)
-                                                                  # data to plot
-if verbose :
-    print("Trimming")
                                                                           # plot
 if verbose :
     print('Plotting')

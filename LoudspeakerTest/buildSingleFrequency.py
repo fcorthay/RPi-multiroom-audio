@@ -103,7 +103,7 @@ left_wave = build_waveform()
 right_wave = left_wave
 # right_wave = np.zeros(len(left_wave)).astype(np.int16)
                                                               # write audio file
-file_spec = "%s-%.3f.wav" % (base_wav_file_name, wave_frequency)
+file_spec = "%s-%09.3f.wav" % (base_wav_file_name, wave_frequency)
 wave_stereo = np.vstack((left_wave, right_wave)).transpose()
 if verbose :
     print("Writing %s" % file_spec)

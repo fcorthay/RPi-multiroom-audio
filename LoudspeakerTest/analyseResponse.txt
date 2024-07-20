@@ -1,0 +1,19 @@
+On the PC:
+rm LoudspeakerTest/Batch/*.wav
+LoudspeakerTest/analyseResponse.bash -p 12 -1v
+LoudspeakerTest/analyseResponse.bash -s 3 -e 5 -p 12 -1v
+LoudspeakerTest/analyseResponse.bash -s 1 -e 9 -p 12 -1v
+
+On the RPi:
+Mopidy/control.bash pause
+sleep 1
+volume 40
+sleep 10
+LoudspeakerTest/analyseResponse.bash -2v
+volume 10
+Mopidy/control.bash play
+
+On the PC:
+LoudspeakerTest/analyseResponse.bash -S 2 -E 3.2 -3v
+
+check 1661.219
