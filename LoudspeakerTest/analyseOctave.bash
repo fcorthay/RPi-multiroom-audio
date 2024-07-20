@@ -59,6 +59,7 @@ usage() {
   usage+=' [-n|--dryRun]'
   usage+=' [-v|--verbose]'
   usage+=' [-h|--help]'
+  usage+=' [octave]'
   echo -e $usage 1>&2 
   exit
 }

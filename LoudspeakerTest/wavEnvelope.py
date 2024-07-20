@@ -16,15 +16,10 @@ INDENT = 2*' '
 #
                                                              # specify arguments
 parser = argparse.ArgumentParser(
-  description='creates a png representation a wav file'
+  description='finds the envelope of the signal from a wav file'
 )
                                                                     # audio file
 parser.add_argument('audioFile')
-                                                                    # plot title
-parser.add_argument(
-    '-t', '--title', default='audio signal envelope',
-    help = 'title above plot'
-)
                                                                 # verbose output
 parser.add_argument(
     '-v', '--verbose', action='store_true',
@@ -37,7 +32,6 @@ script_directory = os.path.dirname(os.path.realpath(__file__))
 input_file_spec = parser_arguments.audioFile
 if not os.path.isfile(input_file_spec) :
     input_file_spec = os.sep.join([script_directory, input_file_spec])
-plot_title = parser_arguments.title
 verbose = parser_arguments.verbose
 
 output_file_spec = '.'.join(input_file_spec.split('.')[:-1]) + '-envelope.wav'

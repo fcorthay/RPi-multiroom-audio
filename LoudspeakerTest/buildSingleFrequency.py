@@ -39,6 +39,11 @@ parser.add_argument(
     '-s', '--rate', default=48000,
     help = 'audio sampling rate'
 )
+                                                              # output directory
+parser.add_argument(
+    '-o', '--output', default=os.path.dirname(os.path.realpath(__file__)),
+    help = 'output directory'
+)
                                                                 # verbose output
 parser.add_argument(
     '-v', '--verbose', action='store_true',
@@ -51,10 +56,10 @@ wave_frequency = float(parser_arguments.frequency)
 wave_duration = float(parser_arguments.duration)
 ramp_duration = float(parser_arguments.ramp)
 sampling_rate = float(parser_arguments.rate)
+output_directory = parser_arguments.output
 verbose = parser_arguments.verbose
 
-script_directory = os.path.dirname(os.path.realpath(__file__))
-base_wav_file_name = script_directory + '/frequency'
+base_wav_file_name = output_directory + '/frequency'
 
 # ==============================================================================
 # Functions

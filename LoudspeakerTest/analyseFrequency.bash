@@ -24,7 +24,7 @@ keepRecording=false
 dryRun=false
 verbose=false
                                                              # specify arguments
-arguments='f:d:r:pPs:e:m:knvh'
+arguments='f:d:r:pPs:e:l:m:knvh'
 declare -A longArguments
 longArguments=(
   ["f"]="frequency"
@@ -134,14 +134,16 @@ fi
 # ==============================================================================
 # Main
 #
+script_directory=`dirname "$0"`
 frequency_string=`perl -E "printf(\"%.3f\", $frequency)"`
-inputFile="frequency-$frequency_string"
-outputFile="record-$frequency_string"
+inputFile="$script_directory/frequency-$frequency_string"
+outputFile="$script_directory/record-$frequency_string"
                                                             # build audio signal
-./buildSingleFrequency.py -f $frequency -d $duration -r $rampTime $verboseParam
+$script_directory/buildSingleFrequency.py -f $frequency \
+  -d $duration -r $rampTime $verboseParam
                                                              # plot audio signal
 if [ $plotInput = true ] ; then
-  ./wavPlot.py $verboseParam -t "wave at $frequency Hz"\
+  $script_directory/wavPlot.py $verboseParam -t "wave at $frequency Hz"\
     $verboseParam $inputFile.wav
 fi
                                                      # record loudspeaker output
@@ -151,7 +153,7 @@ if [ $verbose = true ] ; then
   sleep 0.1
   echo
 else
-    arecord -D plughw:$microphone --format S16_LE \
+  arecord -D plughw:$microphone --format S16_LE \
     --duration $recordDuration $outputFile.wav > /dev/null 2>&1 &
 fi
                                                              # play audio signal
@@ -164,8 +166,8 @@ fi
 sleep $recordWait
                                                        # plot loudspeaker output
 if [ $plotRecorded = true ] ; then
-  ./wavPlot.py -s $recordStart -e $recordEnd    \
-    -t "wave at $frequency_string Hz recording" \
+  $script_directory/wavPlot.py -s $recordStart -e $recordEnd \
+    -t "wave at $frequency_string Hz recording"              \
     $verboseParam $outputFile.wav
 fi
 if [ $keepRecording = false ] ; then
