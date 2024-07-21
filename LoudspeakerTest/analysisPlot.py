@@ -26,14 +26,24 @@ parser = argparse.ArgumentParser(
 )
                                                                     # audio file
 parser.add_argument('audioFile')
+                                                                    # start time
+parser.add_argument(
+    '-s', '--plotStart', default=0,
+    help = 'start time'
+)
+                                                                      # end time
+parser.add_argument(
+    '-e', '--plotEnd', default=0,
+    help = 'end time'
+)
                                                       # region of interest start
 parser.add_argument(
-    '-s', '--start', default=0,
+    '-S', '--start', default=0,
     help = 'region of interest start'
 )
                                                         # region of interest end
 parser.add_argument(
-    '-e', '--end', default=0,
+    '-E', '--end', default=0,
     help = 'region of interest end'
 )
                                                                     # plot title
@@ -49,6 +59,8 @@ parser.add_argument(
                                                              # process arguments
 parser_arguments = parser.parse_args()
 
+start_time = float(parser_arguments.plotStart)
+end_time = float(parser_arguments.plotEnd)
 region_of_interest_start = float(parser_arguments.start)
 region_of_interest_end = float(parser_arguments.end)
 plot_title = parser_arguments.title
@@ -73,17 +85,30 @@ if verbose :
 signal_from_file = wave_data[1]
                                                            # read audio envelope
 envelope_from_file = wav.read(envelope_file_spec)[1]
+                                                                    # trim start
+start_sample_index = round(start_time * sampling_rate)
+signal_to_plot = signal_from_file[start_sample_index:]
+envelope_to_plot = envelope_from_file[start_sample_index:]
+                                                                      # trim end
+duration = 0
+if end_time > 0 :
+    duration = end_time - start_time
+if duration > 0 :
+    end_sample_index = round(duration * sampling_rate)
+    signal_to_plot = signal_to_plot[:end_sample_index]
+    envelope_to_plot = envelope_to_plot[:end_sample_index]
                                                                    # time signal
 sampling_period = 1.0/sampling_rate
-sample_nb = len(signal_from_file)
+sample_nb = len(signal_to_plot)
 t = np.linspace(0, (sample_nb-1)*sampling_period, sample_nb)
                                                                           # plot
 if verbose :
     print('Plotting')
 y_limit = 2**(SIGNAL_BIT_NB-1)
 plt.figure(1, figsize=FIGURE_SIZE)
-plt.plot(t, signal_from_file, SIGNAL_COLOR)
-plt.plot(t, envelope_from_file, ENVELOPE_COLOR)
+plt.plot(t, signal_to_plot, SIGNAL_COLOR)
+#plt.plot(t, signal_to_plot, 'o', SIGNAL_COLOR)
+plt.plot(t, envelope_to_plot, ENVELOPE_COLOR)
 if region_of_interest_start > 0 :
     plt.plot(
         [region_of_interest_start, region_of_interest_start],

@@ -8,6 +8,7 @@ import scipy.io.wavfile as wav
 # ==============================================================================
 # Constants
 #
+SIGNAL_BIT_NB = 16
 THRESHOLD = 16
 INDENT = 2*' '
 
@@ -81,6 +82,10 @@ for index in range(len(input_signal)) :
             block = input_signal[start_index:end_index]
             if not previous_find_positive :
                 block = -block
+            # oddity for sign change with -2^(n-1)
+            for index in range(len(block)) :
+                if block[index]  == -2**(SIGNAL_BIT_NB-1) :
+                    block[index] = 2**(SIGNAL_BIT_NB-1) - 1
             previous_max_amplitude = max_amplitude
             max_amplitude = np.max(block)
             max_amplitude_position = np.argmax(block)

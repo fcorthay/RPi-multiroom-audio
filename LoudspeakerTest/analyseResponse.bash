@@ -3,12 +3,13 @@
 # ==============================================================================
 # Constants
 #
+SAMPLE_RATE='192000'
 SAMPLE_FORMAT='S16_LE'
 RECORD_ADDITIONAL_DURATION=2
 RECORD_INTERVAL_DURATION=3
 
-FILTER_STRING='440'
-FILTER_STRING=''
+PLOT_START=2
+PLOT_END=2.05
 
 INDENT='  '
 INDENT2="$INDENT$INDENT"
@@ -22,6 +23,7 @@ script_directory_full=`realpath $script_directory`
 createStimuli=false
 playAndRecord=false
 analyseResponses=false
+filterRegEx=''
 
 startOctave=4
 endOctave=4
@@ -40,12 +42,13 @@ plotResponses=false
 dryRun=false
 verbose=false
                                                              # specify arguments
-arguments='123s:e:p:d:r:S:E:Pl:m:o:vh'
+arguments='123f:s:e:p:d:r:S:E:Pl:m:o:vh'
 declare -A longArguments
 longArguments=(
   ["1"]="createStimuli"
   ["2"]="playAndRecord"
   ["3"]="analyseResponses"
+  ["f"]="filterRegEx"
   ["s"]="startOctave"
   ["e"]="endOctave"
   ["p"]="pointsPerOctave"
@@ -68,6 +71,7 @@ usage() {
   usage+=' [-1|--createStimuli'
   usage+=' [-2|--playAndRecord'
   usage+=' [-3|--analyseResponses'
+  usage+=' [-f|--filterRegEx'
   usage+="\n\t"
   usage+=' [-s|--startOctave \e[4moctave\e[0m]'
   usage+=' [-e|--endOctave \e[4moctave\e[0m]'
@@ -107,6 +111,7 @@ while getopts ${arguments} option; do
     1) createStimuli=true ;;
     2) playAndRecord=true ;;
     3) analyseResponses=true ;;
+    f) filterRegEx="$OPTARG" ;;
     s) startOctave="$OPTARG" ;;
     e) endOctave="$OPTARG" ;;
     p) pointsPerOctave="$OPTARG" ;;
@@ -130,6 +135,7 @@ if [ $verbose = true ] ; then
   echo "${INDENT}create stimuli         : $createStimuli"
   echo "${INDENT}play and record        : $playAndRecord"
   echo "${INDENT}analyse responses      : $analyseResponses"
+  echo "${INDENT}filter regular expr.   : $filterRegEx"
   echo "${INDENT}points per octave      : $pointsPerOctave"
   echo "${INDENT}wave duration          : $duration s"
   echo "${INDENT}ramp up/down time      : $rampTime s"
@@ -150,7 +156,7 @@ fi
 # Main
 #
 # ------------------------------------------------------------------------------
-# create stimuli
+# 1) create stimuli
 #
 if [ $createStimuli = true ] ; then
   taskStartTime=`date +%s`
@@ -194,7 +200,7 @@ if [ $createStimuli = true ] ; then
 fi
 
 # ------------------------------------------------------------------------------
-# play and record
+# 2) play and record
 #
 if [ $playAndRecord = true ] ; then
   taskStartTime=`date +%s`
@@ -208,8 +214,9 @@ if [ $playAndRecord = true ] ; then
     fi
                                                      # record loudspeaker output
     responseFile=${stimulusFile/frequency/record}
-    recordDuration=`perl -E "print int($duration+$RECORD_ADDITIONAL_DURATION+0.5)"`
-    arecord -D plughw:$microphone --format $SAMPLE_FORMAT \
+    durationCalc="$duration+$RECORD_ADDITIONAL_DURATION+0.5"
+    recordDuration=`perl -E "print int($durationCalc)"`
+    arecord -D plughw:$microphone --format $SAMPLE_FORMAT --rate $SAMPLE_RATE \
       --duration $recordDuration $responseFile > /dev/null 2>&1 &
                                                              # play audio signal
     sudo aplay -D dmix:$loudspeaker $stimulusFile > /dev/null 2>&1
@@ -222,7 +229,7 @@ if [ $playAndRecord = true ] ; then
 fi
 
 # ------------------------------------------------------------------------------
-# analyse responses
+# 3) analyse responses
 #
 if [ $analyseResponses = true ] ; then
   taskStartTime=`date +%s`
@@ -234,12 +241,12 @@ if [ $analyseResponses = true ] ; then
   for responseFile in $outputDirectory/record-*.wav ; do
     recordingRegex='[0-9].wav'
     if [[ $responseFile =~ $recordingRegex ]]; then
-      if [[ $responseFile =~ $FILTER_STRING ]]; then
+      if [[ $responseFile =~ $filterRegEx ]]; then
         if [ $verbose = true ] ; then
           echo "$INDENT$(basename $responseFile)"
         fi
-#        frequencyString=`echo $responseFile | sed 's/.*-//'`
-#        frequencyString=${frequencyString%'.wav'}
+        frequencyString=`echo $responseFile | sed 's/.*-//'`
+        frequencyString=${frequencyString%'.wav'}
                                                        # find responses envelope
         $script_directory/wavEnvelope.py $responseFile
                                                       # find responses amplitude
@@ -251,8 +258,9 @@ if [ $analyseResponses = true ] ; then
                                                     # plot loudspeaker responses
         if [ $plotResponses = true ] ; then
           $script_directory/analysisPlot.py                           \
-          -s $regionOfInterestStart -e $regionOfInterestEnd           \
-            -t "wave at $frequency_string Hz recording" $responseFile
+          -s $PLOT_START -e $PLOT_END                                 \
+          -S $regionOfInterestStart -E $regionOfInterestEnd           \
+            -t "wave at $frequencyString Hz recording" $responseFile
         fi
       fi
     fi

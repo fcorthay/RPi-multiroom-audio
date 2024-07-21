@@ -14,6 +14,6 @@ volume 10
 Mopidy/control.bash play
 
 On the PC:
+rm LoudspeakerTest/Batch/record-*.png
+rm LoudspeakerTest/Batch/record-*-envelope.wav
 LoudspeakerTest/analyseResponse.bash -S 2 -E 3.2 -3v
-
-check 1661.219
