@@ -209,19 +209,21 @@ if [ $playAndRecord = true ] ; then
   fi
                                                             # loop through files
   for stimulusFile in $outputDirectory/frequency-*.wav ; do
-    if [ $verbose = true ] ; then
-      echo "$INDENT$(basename $stimulusFile)"
-    fi
+    if [[ $stimulusFile =~ $filterRegEx ]]; then
+      if [ $verbose = true ] ; then
+        echo "$INDENT$(basename $stimulusFile)"
+      fi
                                                      # record loudspeaker output
-    responseFile=${stimulusFile/frequency/record}
-    durationCalc="$duration+$RECORD_ADDITIONAL_DURATION+0.5"
-    recordDuration=`perl -E "print int($durationCalc)"`
-    arecord -D plughw:$microphone --format $SAMPLE_FORMAT --rate $SAMPLE_RATE \
-      --duration $recordDuration $responseFile > /dev/null 2>&1 &
+      responseFile=${stimulusFile/frequency/record}
+      durationCalc="$duration+$RECORD_ADDITIONAL_DURATION+0.5"
+      recordDuration=`perl -E "print int($durationCalc)"`
+      arecord -D plughw:$microphone --format $SAMPLE_FORMAT --rate $SAMPLE_RATE \
+        --duration $recordDuration $responseFile > /dev/null 2>&1 &
                                                              # play audio signal
-    sudo aplay -D dmix:$loudspeaker $stimulusFile > /dev/null 2>&1
+      sudo aplay -D dmix:$loudspeaker $stimulusFile > /dev/null 2>&1
                                                         # wait for recording end
-    sleep $RECORD_INTERVAL_DURATION
+      sleep $RECORD_INTERVAL_DURATION
+    fi
   done
   taskEndTime=`date +%s`
   executionTime=$((taskEndTime-taskStartTime))
