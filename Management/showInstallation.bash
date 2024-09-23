@@ -1,7 +1,28 @@
 #!/usr/bin/bash
 
+AUDIO_BASE_DIR=$(dirname $(dirname $0))
+
 INDENT='  '
 
+# ------------------------------------------------------------------------------
+# Functions
+#
+function serviceActivity {
+  activity=`sudo service $1 status | grep -E "^ +Active"`
+  activity=`echo $activity | sed 's/.*Active:\s//'`
+  activity=`echo $activity | tr ')' '_' | sed 's/_.*/)/'`
+  echo $activity
+}
+
+function serviceSink {
+  sink=`$AUDIO_BASE_DIR/$1 | tr -d '"'`
+  sink=`echo $sink | sed 's/.*is\s*//'`
+  echo $sink
+}
+
+# ------------------------------------------------------------------------------
+# Main script
+#
 echo -e "Checking for services\n"
 serviceList=`systemctl list-unit-files --type=service`
                                                                         # Mopidy
@@ -11,12 +32,8 @@ serviceExists=`echo $serviceList | grep $service`
 if [ -z "$serviceExists" ] ; then
   echo "${INDENT}service not installed"
 else
-  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
-  serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
-  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
-  echo "${INDENT}$serviceActivity"
-  audioOutput=`cat /etc/mopidy/mopidy.conf | grep ^output | sed 's/.*device=//'`
-  echo "${INDENT}files -> mopidy -> $audioOutput"
+  echo "${INDENT}$(serviceActivity $service)"
+  echo "${INDENT}files -> mopidy -> $(serviceSink Mopidy/mopidySink.bash)"
 fi
                                                                     # snapserver
 echo 'Snapcast server'
@@ -25,37 +42,24 @@ serviceExists=`echo $serviceList | grep $service`
 if [ -z "$serviceExists" ] ; then
   echo "${INDENT}service not installed"
 else
-  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
-  serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
-  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
-  echo "${INDENT}$serviceActivity"
-  audioInput=`cat /etc/snapserver.conf | grep ^source | sed 's/source\s*=\s*//'`
-  if [[ "$audioInput" =~ ^alsa.* ]]; then
-    audioInput=`echo $audioInput | sed 's/.*device=//'`
-  fi
-  echo "${INDENT}$audioInput -> snapserver -> Ethernet"
+  echo "${INDENT}$(serviceActivity $service)"
+  echo "${INDENT}$(serviceSink Snapcast/serverSource.bash)" \
+    "-> snapserver -> Ethernet"
 fi
-                                                                    # snapserver
+                                                                    # snapclient
 echo 'Snapcast client'
 service='snapclient'
 serviceExists=`echo $serviceList | grep $service`
 if [ -z "$serviceExists" ] ; then
   echo "${INDENT}service not installed"
 else
-  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
-  serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
-  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
-  echo "${INDENT}$serviceActivity"
+  echo "${INDENT}$(serviceActivity $service)"
   audioInput=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
   audioInput=`echo $audioInput | sed 's/.*--host\s*//'`
   audioInput=`echo $audioInput | sed 's/\s.*//'`
   audioInput=`echo $audioInput | sed 's/"//'`
-  audioOutput=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
-  audioOutput=`echo $audioOutput | sed 's/.*--soundcard\s*//'`
-  audioOutput=`echo $audioOutput | sed 's/\s.*//'`
-  audioOutput=`echo $audioOutput | sed 's/"//'`
-  audioOutput=`echo $audioOutput | sed 's/Loopback/Loopback(,0,0)/'`
-  echo "${INDENT}Ethernet $audioInput -> snapclient -> $audioOutput"
+  echo "${INDENT}Ethernet $audioInput -> snapclient" \
+    "-> $(serviceSink Snapcast/clientSink.bash)"
 fi
                                                                     # camilladsp
 echo 'CamillaDSP'
@@ -64,10 +68,7 @@ serviceExists=`echo $serviceList | grep $service`
 if [ -z "$serviceExists" ] ; then
   echo "${INDENT}service not installed"
 else
-  serviceActivity=`sudo service $service status | grep -E "^ +Active"`
-  serviceActivity=`echo $serviceActivity | sed 's/.*Active:\s//'`
-  serviceActivity=`echo $serviceActivity | tr ')' '_' | sed 's/_.*/)/'`
-  echo "${INDENT}$serviceActivity"
+  echo "${INDENT}$(serviceActivity $service)"
   audioInput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 capture | grep device`
   audioInput=`echo $audioInput | sed 's/ *device: "//'`
   audioInput=`echo $audioInput | sed 's/".*//'`
