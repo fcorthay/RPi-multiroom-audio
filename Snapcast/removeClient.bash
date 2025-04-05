@@ -18,7 +18,7 @@ declare -A longArguments
 longArguments=(["s"]="server" ["v"]="verbose")
                                                              # show script usage
 usage() {
-  echo "Usage: $(basename "$0") [-v|--verbose] server" 1>&2 
+  echo "Usage: $(basename "$0") [-v|--verbose] [-s|--server server] client" 1>&2 
   exit
 }
                                                         # replace long arguments

@@ -21,13 +21,15 @@ usage() {
   exit
 }
                                                         # replace long arguments
-for index in $(eval echo "{1..${#}}") ; do
-  for argument in "${!longArguments[@]}" ; do
-    if [ ${!index} = "--${longArguments[$argument]}" ] ; then
-      set -- "${@:1:((index - 1))}" "-$argument" "${@:((index + 1)):${#}}"
-    fi
+if [ $# -gt 0 ] ; then
+  for index in $(eval echo "{1..${#}}") ; do
+    for argument in "${!longArguments[@]}" ; do
+      if [ ${!index} = "--${longArguments[$argument]}" ] ; then
+        set -- "${@:1:((index - 1))}" "-$argument" "${@:((index + 1)):${#}}"
+      fi
+    done
   done
-done
+fi
                                                                # parse arguments
 while getopts ${arguments} option; do
   case ${option} in
@@ -49,5 +51,5 @@ fi
 if [ $verbose = 'true' ] ; then
   echo "Changing to Snapcast server \"$snapServer\""
 fi
-sudo sed -i "s/--host [^ ]*/--host $snapServer/" /etc/default/snapclient
+sudo sed -i -E "s/(^[^#].*)--host [^ ]*/\1--host $snapServer/" /etc/default/snapclient
 sudo service snapclient restart
