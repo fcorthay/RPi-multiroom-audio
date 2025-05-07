@@ -78,3 +78,15 @@ else
   audioOutput=`echo $audioOutput | sed 's/".*//'`
   echo "${INDENT}$audioInput -> CamillaDSP -> $audioOutput"
 fi
+                                                                      # alsaloop
+alsaloopCommand=`ps ax | grep -v grep | grep alsaloop`
+if [ -n "$alsaloopCommand" ] ; then
+  echo "Alsaloop"
+  audioInput=`echo $alsaloopCommand | sed 's/.*-C *//'`
+  audioInput=`echo $audioInput | sed 's/ .*//'`
+  audioInput=`echo $audioInput | sed 's/.*\://'`
+  audioOutput=`echo $alsaloopCommand | sed 's/.*-P *//'`
+  audioOutput=`echo $audioOutput | sed 's/ .*//'`
+  audioOutput=`echo $audioOutput | sed 's/.*\://'`
+  echo "${INDENT}$audioInput -> alsaloop -> $audioOutput"
+fi

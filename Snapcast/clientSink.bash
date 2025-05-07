@@ -58,7 +58,7 @@ audioOutputFull=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
 audioOutput=`echo $audioOutputFull | sed 's/.*--soundcard\s*//'`
 audioOutput=`echo $audioOutput | sed 's/\s.*//'`
 audioOutput=`echo $audioOutput | sed 's/"//'`
-audioOutput=`echo $audioOutput | sed 's/Loopback/Loopback(,0,0)/'`
+audioOutput=`echo $audioOutput | sed 's/Loopback/Loopback,0,0/'`
 echo "Snapclient sink is \"$audioOutput\""
 if [ $verbose = 'true' ] ; then
   echo "${INDENT}$audioOutputFull"
