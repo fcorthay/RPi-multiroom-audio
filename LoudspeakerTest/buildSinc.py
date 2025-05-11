@@ -9,6 +9,9 @@ import os
 # Constants
 #
 sample_bit_nb = 16
+int_type = np.int16
+sample_bit_nb = 32
+int_type = np.int32
 
 INDENT = 2*' '
 
@@ -17,22 +20,22 @@ INDENT = 2*' '
 #
                                                              # specify arguments
 parser = argparse.ArgumentParser(
-  description='builds an audio file with a single frequency sine wave'
+  description='builds an audio file containing a cardinal sine'
 )
-                                                                # wave frequency
+                                                                # sine frequency
 parser.add_argument(
-    '-f', '--frequency', default=440,
-    help = 'wave frequency'
+    '-f', '--frequency', default=100000,
+    help = 'sine frequency'
 )
-                                                                 # wave duration
+                                                   # positive time period number
 parser.add_argument(
-    '-d', '--duration', default=3,
-    help = 'wave duration'
+    '-p', '--periods', default=500,
+    help = 'positive time period number'
 )
-                                                             # ramp up/down time
+                                                        # sinc repetition number
 parser.add_argument(
-    '-r', '--ramp', default=0.5,
-    help = 'ramp up/down time'
+    '-r', '--repeat', default=100,
+    help = 'number of sinc repetition'
 )
                                                                  # sampling rate
 parser.add_argument(
@@ -52,58 +55,55 @@ parser.add_argument(
                                                              # process arguments
 parser_arguments = parser.parse_args()
 
-wave_frequency = float(parser_arguments.frequency)
-wave_duration = float(parser_arguments.duration)
-ramp_duration = float(parser_arguments.ramp)
+sine_frequency = float(parser_arguments.frequency)
+sine_period_nb = float(parser_arguments.periods)
+repetition_nb = int(parser_arguments.repeat)
 sampling_rate = float(parser_arguments.rate)
 output_directory = parser_arguments.output
 verbose = parser_arguments.verbose
 
-base_wav_file_name = output_directory + '/frequency'
+base_wav_file_name = output_directory + '/sinc'
 
 # ==============================================================================
 # Functions
 #
-def build_waveform(amplitude=2**15-1):
+def build_waveform(amplitude=2**(sample_bit_nb-1)-1):
     '''
     Builds the waveform for a given frequency
     '''
                                                                     # parameters
-    wave_period = 1/wave_frequency
-    wave_period_nb = round(wave_duration/wave_period)
+    sine_period = 1/sine_frequency
+    sinc_half_wave_duration = sine_period_nb * sine_period
+    sinc_wave_duration = 2*sinc_half_wave_duration
+    wave_duration = repetition_nb*sinc_wave_duration
     if verbose :
-        print(INDENT + "period nb : %d" % wave_period_nb)
-    integer_period_duration = wave_period_nb*wave_period
+        print(INDENT + "wave duration : %g" % wave_duration)
     sampling_period = 1/sampling_rate
-    waveform_sample_nb = round(integer_period_duration/sampling_period)
-    t_waveform = np.linspace(0, integer_period_duration, waveform_sample_nb)
+    half_waveform_sample_nb = round(sinc_wave_duration/sampling_period) + 1
+    t_waveform = np.linspace(
+        0, sinc_half_wave_duration, half_waveform_sample_nb
+    )
                                                                  # standing wave
-    standing_wave = np.sin(2*np.pi*wave_frequency*t_waveform)
-                                                                    # ramp shape
-    ramp_sample_nb = round(ramp_duration/sampling_period)
-    ramp_cosine_frequency = sampling_rate/(2*ramp_sample_nb)
-    t_ramp = t_waveform[:ramp_sample_nb]
-    ramp_envelope = 0.5*(1 - np.cos(2*np.pi*ramp_cosine_frequency*t_ramp))
-                                                                      # envelope
-    envelope = np.ones(len(standing_wave))
-    envelope[:ramp_sample_nb] = ramp_envelope
-    envelope[-ramp_sample_nb:] = np.flipud(ramp_envelope)
+    half_wave = np.sinc(2*sine_frequency*t_waveform)
                                                                       # assembly
-    wave = amplitude * np.multiply(standing_wave, envelope)
+    sinc_wave = amplitude*np.concatenate((np.flipud(half_wave), half_wave[1:]))
+    wave = sinc_wave
+    for index in range(repetition_nb) :
+        wave = np.concatenate((wave, sinc_wave))
 
-    return wave.astype(np.int16)
+    return wave.astype(int_type)
 
 # ==============================================================================
 # Main
 #
                                                                 # build waveform
 if verbose :
-    print("Building waveform at %g Hz" % wave_frequency)
+    print("Building waveform at %g Hz" % sine_frequency)
 left_wave = build_waveform()
 right_wave = left_wave
-# right_wave = np.zeros(len(left_wave)).astype(np.int16)
+# right_wave = np.zeros(len(left_wave)).astype(int_type)
                                                               # write audio file
-file_spec = "%s-%09.3f.wav" % (base_wav_file_name, wave_frequency)
+file_spec = "%s-%09.3f.wav" % (base_wav_file_name, sine_frequency)
 wave_stereo = np.vstack((left_wave, right_wave)).transpose()
 if verbose :
     print("Writing %s" % file_spec)
