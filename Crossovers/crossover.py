@@ -50,10 +50,10 @@ parser.add_argument(
     '-f', '--shift', default=2,
     help = 'frequency shift factor'
 )
-                                                               # stopband ripple
+                                                               # bassband ripple
 parser.add_argument(
-    '-s', '--ripple', default=40,
-    help = 'stopband ripple'
+    '-r', '--ripple', default=1,
+    help = 'passband ripple'
 )
                                                                 # verbose output
 parser.add_argument(
@@ -77,7 +77,7 @@ filter_type = filter_type.capitalize()
 cutoff_frequency = int(parser_arguments.cutoff)
 filter_order = int(parser_arguments.order)
 shift_factor = float(parser_arguments.shift)
-stopband_ripple = int(parser_arguments.ripple)
+passband_ripple = int(parser_arguments.ripple)
 interactive = parser_arguments.interactive
 verbose = parser_arguments.verbose
 
@@ -105,12 +105,12 @@ if filter_type.lower() == 'butterworth' :
         filter_order, 2*math.pi*cutoff_frequency, 'high', analog=True
     )
 if filter_type.lower() == 'chebyshev' :
-    lowpass_b, lowpass_a = signal.cheby2(
-        filter_order, stopband_ripple, 2*math.pi*cutoff_frequency,
+    lowpass_b, lowpass_a = signal.cheby1(
+        filter_order, passband_ripple, 2*math.pi*cutoff_frequency,
         'low', analog=True
     )
-    highpass_b, highpass_a = signal.cheby2(
-        filter_order, stopband_ripple, 2*math.pi*cutoff_frequency,
+    highpass_b, highpass_a = signal.cheby1(
+        filter_order, passband_ripple, 2*math.pi*cutoff_frequency,
         'high', analog=True
     )
 region_of_interest = np.logspace(
