@@ -21,7 +21,7 @@ devices:
     format: S32LE
 
 mixers:
-  passtrough:
+  stereoToMono:
     channels:
       in: 2
       out: 2
@@ -29,14 +29,20 @@ mixers:
       - dest: 0
         sources:
           - channel: 0
-            gain: 0
+            gain: -6
+            inverted: false
+          - channel: 1
+            gain: -6
             inverted: false
       - dest: 1
         sources:
+          - channel: 0
+            gain: -40
+            inverted: false
           - channel: 1
-            gain: 0
+            gain: -40
             inverted: false
 
 pipeline:
   - type: Mixer
-    name: passtrough
+    name: stereoToMono

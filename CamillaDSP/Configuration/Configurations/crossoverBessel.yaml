@@ -1,0 +1,108 @@
+---
+devices:
+  samplerate: 48000
+  enable_rate_adjust: true
+  resampler:
+    type: AsyncPoly
+    interpolation: Cubic
+  capture_samplerate: 192000
+  chunksize: 2048
+  silence_threshold: -60
+  silence_timeout: 3.0
+  capture:
+    type: Alsa
+    channels: 2
+    device: "hw:Loopback,1,0"
+    format: S32LE
+  playback:
+    type: Alsa
+    channels: 2
+    device: "dmix:sndrpihifiberry"
+    format: S32LE
+
+mixers:
+  stereoToLeft:
+    channels:
+      in: 2
+      out: 2
+    mapping:
+      - dest: 0
+        sources:
+          - channel: 0
+            gain: 0
+            inverted: false
+      - dest: 1
+        sources:
+          - channel: 0
+            gain: 0
+            inverted: false
+
+filters:
+  lowpass1:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3830.27
+      q: 1.22567
+  lowpass2:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3418.09
+      q: 0.710852
+  lowpass3:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3206.16
+      q: 0.559609
+  lowpass4:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3112.32
+      q: 0.505991
+  highpass1:
+    type: Biquad
+    parameters:
+      type: Highpass
+      freq: 3198.21
+      q: 1.22567
+  highpass2:
+    type: Biquad
+    parameters:
+      type: Highpass
+      freq: 3583.87
+      q: 0.710852
+  highpass3:
+    type: Biquad
+    parameters:
+      type: Highpass
+      freq: 3935.98
+      q: 0.505991
+  highpass4:
+    type: Biquad
+    parameters:
+      type: Highpass
+      freq: 3820.77
+      q: 0.559609
+
+pipeline:
+  - type: Mixer
+    name: stereoToLeft
+  - type: Filter
+    channels:
+      - 0
+    names:
+      - lowpass1
+      - lowpass2
+      - lowpass3
+      - lowpass4
+  - type: Filter
+    channels:
+      - 1
+    names:
+      - highpass1
+      - highpass2
+      - highpass3
+      - highpass4
