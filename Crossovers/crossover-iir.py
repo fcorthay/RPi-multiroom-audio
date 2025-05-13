@@ -50,12 +50,12 @@ parser.add_argument(
     '-f', '--shift', default=2,
     help = 'frequency shift factor'
 )
-                                                               # bassband ripple
+                                                 # passband ripple for Chebyshev
 parser.add_argument(
     '-r', '--ripple', default=1,
     help = 'passband ripple'
 )
-                                                                # verbose output
+                                                       # matplotlib display type
 parser.add_argument(
     '-i', '--interactive', action='store_true',
     help = 'show plots on screen'
@@ -74,7 +74,7 @@ if (filter_type.lower() == 'butt') or (filter_type.lower() == 'butter') :
 if filter_type.lower() == 'cheby' :
     filter_type = 'chebyshev'
 filter_type = filter_type.capitalize()
-cutoff_frequency = int(parser_arguments.cutoff)
+cutoff_frequency = float(parser_arguments.cutoff)
 filter_order = int(parser_arguments.order)
 shift_factor = float(parser_arguments.shift)
 passband_ripple = int(parser_arguments.ripple)
@@ -155,6 +155,7 @@ for index in range(len(p)) :
 if verbose :
     print(INDENT + "writing template %s" % yaml_file_spec)
 configuration_file = open(yaml_file_spec, 'w')
+                                                                       # filters
 configuration_file.write("filters:\n")
 for index in range(len(lowpass_frequencies)) :
     configuration_file.write(INDENT + "lowpass%d:\n" % (index + 1))
@@ -179,6 +180,7 @@ for index in range(len(highpass_frequencies)) :
         3*INDENT + "q: %g\n" % highpass_quality_factors[index]
     )
 configuration_file.write("\n")
+                                                                      # pipeline
 configuration_file.write("pipeline:\n")
 configuration_file.write(INDENT + "- type: Filter\n")
 configuration_file.write(2*INDENT + "channels:\n")
