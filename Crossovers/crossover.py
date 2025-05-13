@@ -126,7 +126,7 @@ f = w/(2*math.pi)
                                                                        # biquads
 if verbose :
     print("Biquads")
-    print(INDENT + "Lowpass")
+    print(INDENT + "lowpass")
 z, p, k = signal.tf2zpk(lowpass_b, lowpass_a)
 lowpass_frequencies = []
 lowpass_quality_factors = []
@@ -139,7 +139,7 @@ for index in range(len(p)) :
         if verbose :
             print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
 if verbose :
-    print(INDENT + "Highpass")
+    print(INDENT + "highpass")
 z, p, k = signal.tf2zpk(highpass_b, highpass_a)
 highpass_frequencies = []
 highpass_quality_factors = []
@@ -152,7 +152,8 @@ for index in range(len(p)) :
         if verbose :
             print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
                                                             # configuration file
-print(lowpass_frequencies)
+if verbose :
+    print(INDENT + "writing template %s" % yaml_file_spec)
 configuration_file = open(yaml_file_spec, 'w')
 configuration_file.write("filters:\n")
 for index in range(len(lowpass_frequencies)) :
