@@ -1,2 +1,3 @@
 *.pyc
 LocalSettings/*
+Crossovers/*.yaml

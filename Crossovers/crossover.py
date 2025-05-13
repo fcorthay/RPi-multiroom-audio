@@ -81,7 +81,9 @@ passband_ripple = int(parser_arguments.ripple)
 interactive = parser_arguments.interactive
 verbose = parser_arguments.verbose
 
-png_file_spec = os.sep.join([script_directory, filter_type.lower() + '.png'])
+output_files_spec = os.sep.join([script_directory, filter_type.lower()])
+png_file_spec = output_files_spec + '.png'
+yaml_file_spec = output_files_spec + '.yaml'
 
 # ==============================================================================
 # Main
@@ -122,21 +124,75 @@ w, lowpass_h = signal.freqs(lowpass_b, lowpass_a, worN=region_of_interest)
 w, highpass_h = signal.freqs(highpass_b, highpass_a, worN=region_of_interest)
 f = w/(2*math.pi)
                                                                        # biquads
-print("Biquads")
-print(INDENT + "Lowpass")
+if verbose :
+    print("Biquads")
+    print(INDENT + "Lowpass")
 z, p, k = signal.tf2zpk(lowpass_b, lowpass_a)
+lowpass_frequencies = []
+lowpass_quality_factors = []
 for index in range(len(p)) :
     if p[index].imag >= 0 :
         frequency = abs(p[index])/(2*math.pi)
+        lowpass_frequencies.append(frequency)
         quality_factor = abs(p[index]) / (-2*p[index].real)
-        print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
-print(INDENT + "Highpass")
+        lowpass_quality_factors.append(quality_factor)
+        if verbose :
+            print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
+if verbose :
+    print(INDENT + "Highpass")
 z, p, k = signal.tf2zpk(highpass_b, highpass_a)
+highpass_frequencies = []
+highpass_quality_factors = []
 for index in range(len(p)) :
     if p[index].imag >= 0 :
         frequency = abs(p[index])/(2*math.pi)
+        highpass_frequencies.append(frequency)
         quality_factor = abs(p[index]) / (-2*p[index].real)
-        print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
+        highpass_quality_factors.append(quality_factor)
+        if verbose :
+            print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
+                                                            # configuration file
+print(lowpass_frequencies)
+configuration_file = open(yaml_file_spec, 'w')
+configuration_file.write("filters:\n")
+for index in range(len(lowpass_frequencies)) :
+    configuration_file.write(INDENT + "lowpass%d:\n" % (index + 1))
+    configuration_file.write(2*INDENT + "type: Biquad\n")
+    configuration_file.write(2*INDENT + "parameters:\n")
+    configuration_file.write(3*INDENT + "type: Lowpass\n")
+    configuration_file.write(
+        3*INDENT + "freq: %g\n" % lowpass_frequencies[index]
+    )
+    configuration_file.write(
+        3*INDENT + "q: %g\n" % lowpass_quality_factors[index]
+    )
+for index in range(len(highpass_frequencies)) :
+    configuration_file.write(INDENT + "highpass%d:\n" % (index+1))
+    configuration_file.write(2*INDENT + "type: Biquad\n")
+    configuration_file.write(2*INDENT + "parameters:\n")
+    configuration_file.write(3*INDENT + "type: Lowpass\n")
+    configuration_file.write(
+        3*INDENT + "freq: %g\n" % highpass_frequencies[index]
+    )
+    configuration_file.write(
+        3*INDENT + "q: %g\n" % highpass_quality_factors[index]
+    )
+configuration_file.write("\n")
+configuration_file.write("pipeline:\n")
+configuration_file.write(INDENT + "- type: Filter\n")
+configuration_file.write(2*INDENT + "channels:\n")
+configuration_file.write(3*INDENT + "- 0\n")
+configuration_file.write(2*INDENT + "names:\n")
+for index in range(len(lowpass_frequencies)) :
+    configuration_file.write(3*INDENT + "- lowpass%d\n" % (index+1))
+configuration_file.write(INDENT + "- type: Filter\n")
+configuration_file.write(2*INDENT + "channels:\n")
+configuration_file.write(3*INDENT + "- 1\n")
+configuration_file.write(2*INDENT + "names:\n")
+for index in range(len(lowpass_frequencies)) :
+    configuration_file.write(3*INDENT + "- highpass%d\n" % (index+1))
+
+configuration_file.close()
                                                                           # plot
 if verbose :
     print('Plotting')
