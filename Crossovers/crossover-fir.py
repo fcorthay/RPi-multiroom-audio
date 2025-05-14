@@ -89,7 +89,9 @@ verbose = parser_arguments.verbose
 
 output_files_spec = os.sep.join([script_directory, filter_type.lower()])
 png_file_spec = output_files_spec + '.png'
-yaml_file_spec = output_files_spec + '.yaml'
+coefficient_file_spec = output_files_spec + "-o%g-c%g-s%g" % (
+    filter_order, cutoff_frequency, sampling_frequency
+)
 
 # ==============================================================================
 # Main
@@ -142,8 +144,22 @@ f, highpass_h = signal.freqz(
     worN=region_of_interest,
     fs=sampling_frequency
 )
-                                                            # configuration file
-print(lowpass_tap_coefficients)
+                                                             # coefficient files
+lowpass_coefficient_file_spec = coefficient_file_spec + '-w1.txt'
+if verbose :
+    print("Writing coefficient files")
+    print(INDENT + lowpass_coefficient_file_spec)
+coefficient_file = open(lowpass_coefficient_file_spec, 'w')
+for index in range(len(lowpass_tap_coefficients)) :
+    coefficient_file.write("%g\n" % lowpass_tap_coefficients[index])
+coefficient_file.close()
+highpass_coefficient_file_spec = coefficient_file_spec + '-w2.txt'
+if verbose :
+    print(INDENT + highpass_coefficient_file_spec)
+coefficient_file = open(highpass_coefficient_file_spec, 'w')
+for index in range(len(highpass_tap_coefficients)) :
+    coefficient_file.write("%g\n" % highpass_tap_coefficients[index])
+coefficient_file.close()
                                                                           # plot
 if verbose :
     print('Plotting')
