@@ -1,5 +1,5 @@
 aiohttp
 jsonschema
 PyYAML
-git+https://github.com/HEnquist/pycamilladsp.git@v2.0.2
-camilladsp-plot[plot]@git+https://github.com/HEnquist/pycamilladsp-plot.git@v2.0.0
+git+https://github.com/HEnquist/pycamilladsp.git@v3.0.0
+camilladsp-plot[plot]@git+https://github.com/HEnquist/pycamilladsp-plot.git@v3.0.2

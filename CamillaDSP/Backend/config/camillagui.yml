@@ -5,9 +5,10 @@ bind_address: "AudioAmp.local"
 port: 5005
 ssl_certificate: null
 ssl_private_key: null
+gui_config_file: null
 config_dir: "/home/amp/Documents/RPi-multiroom-audio/CamillaDSP/Configuration/Configurations"
 coeff_dir: "/home/amp/Documents/RPi-multiroom-audio/CamillaDSP/Configuration/Coefficients"
-default_config: "/home/amp/Documents/RPi-multiroom-audio/CamillaDSP/Configuration/Coefficients/default.yaml"
+default_config: "/home/amp/Documents/RPi-multiroom-audio/CamillaDSP/Configuration/camillaconfig.yaml"
 statefile_path: "/home/amp/Documents/RPi-multiroom-audio/CamillaDSP/Backend/statefile.yml"
 log_file: "/home/amp/Documents/RPi-multiroom-audio/CamillaDSP/Backend/camilladsp.log"
 on_set_active_config: null

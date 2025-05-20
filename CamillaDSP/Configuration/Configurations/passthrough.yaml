@@ -17,7 +17,7 @@ devices:
   playback:
     type: Alsa
     channels: 2
-    device: "dmix:sndrpihifiberry"
+    device: "dmix:sndrpijustboomd"
     format: S32LE
 
 mixers:
