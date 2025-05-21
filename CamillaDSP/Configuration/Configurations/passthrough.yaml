@@ -1,11 +1,6 @@
 ---
 devices:
   samplerate: 48000
-  enable_rate_adjust: true
-  resampler:
-    type: AsyncPoly
-    interpolation: Cubic
-  capture_samplerate: 192000
   chunksize: 2048
   silence_threshold: -60
   silence_timeout: 3.0
