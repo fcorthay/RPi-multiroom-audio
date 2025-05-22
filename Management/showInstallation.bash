@@ -23,61 +23,77 @@ function serviceSink {
 # ------------------------------------------------------------------------------
 # Main script
 #
-echo -e "Checking for services\n"
-serviceList=`systemctl list-unit-files --type=service`
+                                                            # Check for services
+serviceList=''
+reply=`sudo -nv 2>&1`
+if [[ $reply != Sorry* ]] ; then
+  echo -e "Checking for services\n"
+  serviceList=`systemctl list-unit-files --type=service`
+fi
                                                                         # Mopidy
 echo 'Mopidy'
 service='mopidy'
-serviceExists=`echo $serviceList | grep $service`
-if [ -z "$serviceExists" ] ; then
-  echo "${INDENT}service not installed"
-else
-  echo "${INDENT}$(serviceActivity $service)"
-  echo "${INDENT}files -> mopidy -> $(serviceSink Mopidy/mopidySink.bash)"
+if [ -n "$serviceList" ] ; then
+  serviceExists=`echo $serviceList | grep $service`
+  if [ -z "$serviceExists" ] ; then
+    echo "${INDENT}service not installed"
+  else
+    echo "${INDENT}$(serviceActivity $service)"
+  fi
 fi
+echo "${INDENT}files -> mopidy -> $(serviceSink Mopidy/mopidySink.bash)"
                                                                     # snapserver
 echo 'Snapcast server'
 service='snapserver'
-serviceExists=`echo $serviceList | grep $service`
-if [ -z "$serviceExists" ] ; then
-  echo "${INDENT}service not installed"
-else
-  echo "${INDENT}$(serviceActivity $service)"
-  echo "${INDENT}$(serviceSink Snapcast/serverSource.bash)" \
-    "-> snapserver -> Ethernet"
+if [ -n "$serviceList" ] ; then
+  serviceExists=`echo $serviceList | grep $service`
+  if [ -z "$serviceExists" ] ; then
+    echo "${INDENT}service not installed"
+  else
+    echo "${INDENT}$(serviceActivity $service)"
+  fi
 fi
+echo "${INDENT}$(serviceSink Snapcast/serverSource.bash)" \
+  "-> snapserver -> Ethernet"
                                                                     # snapclient
 echo 'Snapcast client'
 service='snapclient'
-serviceExists=`echo $serviceList | grep $service`
-if [ -z "$serviceExists" ] ; then
-  echo "${INDENT}service not installed"
-else
-  echo "${INDENT}$(serviceActivity $service)"
-  audioInput=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
-  audioInput=`echo $audioInput | sed 's/.*--host\s*//'`
-  audioInput=`echo $audioInput | sed 's/\s.*//'`
-  audioInput=`echo $audioInput | sed 's/"//'`
-  echo "${INDENT}Ethernet $audioInput -> snapclient" \
-    "-> $(serviceSink Snapcast/clientSink.bash)"
+if [ -n "$serviceList" ] ; then
+  serviceExists=`echo $serviceList | grep $service`
+  if [ -z "$serviceExists" ] ; then
+    echo "${INDENT}service not installed"
+  else
+    echo "${INDENT}$(serviceActivity $service)"
+    audioInput=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
+    audioInput=`echo $audioInput | sed 's/.*--host\s*//'`
+    audioInput=`echo $audioInput | sed 's/\s.*//'`
+    audioInput=`echo $audioInput | sed 's/"//'`
+  fi
 fi
+echo "${INDENT}Ethernet $audioInput -> snapclient" \
+  "-> $(serviceSink Snapcast/clientSink.bash)"
                                                                     # camilladsp
 echo 'CamillaDSP'
 service='camilladsp'
-serviceExists=`echo $serviceList | grep $service`
-if [ -z "$serviceExists" ] ; then
-  echo "${INDENT}service not installed"
-else
-  echo "${INDENT}$(serviceActivity $service)"
-  audioInput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 capture | grep device`
-  audioInput=`echo $audioInput | sed 's/ *device: "//'`
-  audioInput=`echo $audioInput | sed 's/".*//'`
-  audioOutput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 playback`
-  audioOutput=`echo -e "$audioOutput" | grep device`
-  audioOutput=`echo $audioOutput | sed 's/ *device: "//'`
-  audioOutput=`echo $audioOutput | sed 's/".*//'`
-  echo "${INDENT}$audioInput -> CamillaDSP -> $audioOutput"
+if [ -n "$serviceList" ] ; then
+  serviceExists=`echo $serviceList | grep $service`
+  if [ -z "$serviceExists" ] ; then
+    echo "${INDENT}service not installed"
+  else
+    echo "${INDENT}$(serviceActivity $service)"
+  fi
 fi
+if [ -z "$CAMILLA_CONFIGURATION_FILE" ] ; then
+  source $AUDIO_BASE_DIR/configuration.bash
+fi
+audioInput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 capture | grep device`
+audioInput=`echo $audioInput | sed 's/ *device: "//'`
+audioInput=`echo $audioInput | sed 's/".*//'`
+audioOutput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 playback`
+audioOutput=`echo -e "$audioOutput" | grep device`
+audioOutput=`echo $audioOutput | sed 's/ *device: "//'`
+audioOutput=`echo $audioOutput | sed 's/".*//'`
+echo "${INDENT}$audioInput -> CamillaDSP -> $audioOutput"
                                                                       # alsaloop
 alsaloopCommand=`ps ax | grep -v grep | grep alsaloop`
 if [ -n "$alsaloopCommand" ] ; then
