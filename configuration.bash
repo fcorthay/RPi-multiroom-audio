@@ -19,7 +19,7 @@ export ALSA_LOOPBACK_CAPTURE_DEVICE='Loopback,0'
 export ALSA_LOOPBACK_PLAYBACK_DEVICE='Loopback,1'
 
 # CamillaDSP
-export CAMILLA_DIR=`realpath -s ~/Documents/RPi-multiroom-audio/CamillaDSP/`
+export CAMILLA_DIR=`realpath -s $AUDIO_BASE_DIR/CamillaDSP/`
 export CAMILLA_CONFIGURATION_DIR="$CAMILLA_DIR/Configuration"
 export CAMILLA_CONFIGURATION_FILE="$CAMILLA_CONFIGURATION_DIR/camillaconfig.yaml"
 export CAMILLA_CONFIGURATIONS_DIR="$CAMILLA_CONFIGURATION_DIR/Configurations"
