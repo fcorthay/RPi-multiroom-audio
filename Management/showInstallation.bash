@@ -41,7 +41,9 @@ if [ -n "$serviceList" ] ; then
     echo "${INDENT}$(serviceActivity $service)"
   fi
 fi
-echo "${INDENT}files -> mopidy -> $(serviceSink Mopidy/mopidySink.bash)"
+if [ -f /etc/mopidy/mopidy.conf ] ; then
+  echo "${INDENT}files -> mopidy -> $(serviceSink Mopidy/mopidySink.bash)"
+fi
                                                                     # snapserver
 echo 'Snapcast server'
 service='snapserver'
@@ -53,8 +55,10 @@ if [ -n "$serviceList" ] ; then
     echo "${INDENT}$(serviceActivity $service)"
   fi
 fi
-echo "${INDENT}$(serviceSink Snapcast/serverSource.bash)" \
-  "-> snapserver -> Ethernet"
+if [ -f /etc/snapserver.conf ] ; then
+  echo "${INDENT}$(serviceSink Snapcast/serverSource.bash)" \
+    "-> snapserver -> Ethernet"
+fi
                                                                     # snapclient
 echo 'Snapcast client'
 service='snapclient'
@@ -70,8 +74,10 @@ if [ -n "$serviceList" ] ; then
     audioInput=`echo $audioInput | sed 's/"//'`
   fi
 fi
-echo "${INDENT}Ethernet $audioInput -> snapclient" \
-  "-> $(serviceSink Snapcast/clientSink.bash)"
+if [ -f /etc/default/snapclient ] ; then
+  echo "${INDENT}Ethernet $audioInput -> snapclient" \
+    "-> $(serviceSink Snapcast/clientSink.bash)"
+fi
                                                                     # camilladsp
 echo 'CamillaDSP'
 service='camilladsp'
@@ -86,14 +92,16 @@ fi
 if [ -z "$CAMILLA_CONFIGURATION_FILE" ] ; then
   source $AUDIO_BASE_DIR/configuration.bash
 fi
-audioInput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 capture | grep device`
-audioInput=`echo $audioInput | sed 's/ *device: "//'`
-audioInput=`echo $audioInput | sed 's/".*//'`
-audioOutput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 playback`
-audioOutput=`echo -e "$audioOutput" | grep device`
-audioOutput=`echo $audioOutput | sed 's/ *device: "//'`
-audioOutput=`echo $audioOutput | sed 's/".*//'`
-echo "${INDENT}$audioInput -> CamillaDSP -> $audioOutput"
+if [ -f $CAMILLA_CONFIGURATION_FILE ] ; then
+  audioInput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 capture | grep device`
+  audioInput=`echo $audioInput | sed 's/ *device: "//'`
+  audioInput=`echo $audioInput | sed 's/".*//'`
+  audioOutput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 playback`
+  audioOutput=`echo -e "$audioOutput" | grep device`
+  audioOutput=`echo $audioOutput | sed 's/ *device: "//'`
+  audioOutput=`echo $audioOutput | sed 's/".*//'`
+  echo "${INDENT}$audioInput -> CamillaDSP -> $audioOutput"
+fi
                                                                       # alsaloop
 alsaloopCommand=`ps ax | grep -v grep | grep alsaloop`
 if [ -n "$alsaloopCommand" ] ; then
