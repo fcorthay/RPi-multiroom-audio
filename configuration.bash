@@ -28,3 +28,10 @@ export CAMILLA_BACKEND_DIR="$CAMILLA_DIR/Backend"
 export CAMILLA_CONTROL_PORT='5005'
 export CAMILLA_GUI_PORT='5006'
 export CAMILLA_GUI_STATE_FILE="$CAMILLA_BACKEND_DIR/statefile.yml"
+
+# radio stations
+export RADIO_COULEUR_3='http://stream.srg-ssr.ch/m/couleur3/mp3_128'
+export RADIO_OPTION_MUSIQUE='http://stream.srg-ssr.ch/m/option-musique/mp3_128'
+export RADIO_SWISS_POP='http://stream.srg-ssr.ch/m/rsp/mp3_128'
+export RADIO_ROCK_BALLADS='http://spoonradiorockballads.ice.infomaniak.ch/spoon-rockballads-hd.aac'
+export RADIO_NOSTALGIE='http://cdn.nrjaudio.fm/adwz2/fr/30601/mp3_128.mp3'
