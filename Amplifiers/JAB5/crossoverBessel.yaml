@@ -1,0 +1,169 @@
+---
+devices:
+  samplerate: 48000
+  enable_rate_adjust: true
+  chunksize: 2048
+  silence_threshold: -60
+  silence_timeout: 3.0
+  capture:
+    type: Alsa
+    channels: 2
+    device: "hw:Loopback,1,0"
+    format: S32LE
+  playback:
+    type: Alsa
+    channels: 2
+    device: "dmix:UCM"
+    format: S16LE
+
+mixers:
+  stereoToLeft:
+    channels:
+      in: 2
+      out: 2
+    mapping:
+      - dest: 0
+        sources:
+          - channel: 0
+            gain: 0
+            inverted: false
+      - dest: 1
+        sources:
+          - channel: 0
+            gain: 0
+            inverted: false
+
+filters:
+  lowpass1:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3914.36
+      q: 1.92927
+  lowpass2:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3587.7
+      q: 1.08906
+  lowpass3:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3374.19
+      q: 0.81041
+  lowpass4:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3223.29
+      q: 0.671382
+  lowpass5:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3115.32
+      q: 0.591145
+  lowpass6:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 3040.35
+      q: 0.542678
+  lowpass7:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 2969.78
+      q: 0.501578
+  lowpass8:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 2992.85
+      q: 0.514571
+  highpass1:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 1596.68
+      q: 1.92927
+  highpass2:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 1742.06
+      q: 1.08906
+  highpass3:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 1852.3
+      q: 0.81041
+  highpass4:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 1939.01
+      q: 0.671382
+  highpass5:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 2006.22
+      q: 0.591145
+  highpass6:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 2055.69
+      q: 0.542678
+  highpass7:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 2104.53
+      q: 0.501578
+  highpass8:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 2088.31
+      q: 0.514571
+  highPassDelayAdjust:
+    type: Delay
+    parameters:
+      delay: 0.6
+      unit: ms
+      subsample: false
+
+pipeline:
+  - type: Mixer
+    name: stereoToLeft
+  - type: Filter
+    channels:
+      - 0
+    names:
+      - lowpass1
+      - lowpass2
+      - lowpass3
+      - lowpass4
+      - lowpass5
+      - lowpass6
+      - lowpass7
+      - lowpass8
+  - type: Filter
+    channels:
+      - 1
+    names:
+      - highpass1
+      - highpass2
+      - highpass3
+      - highpass4
+      - highpass5
+      - highpass6
+      - highpass7
+      - highpass8
+      - highPassDelayAdjust
+
+
