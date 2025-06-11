@@ -150,7 +150,13 @@ for index in range(len(p)) :
         quality_factor = abs(p[index]) / (-2*p[index].real)
         highpass_quality_factors.append(quality_factor)
         if verbose :
-            print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
+            if p[index].imag > 0 :
+                print(2*INDENT + "f = %g, Q = %g" % (frequency, quality_factor))
+            else :
+                print(
+                    2*INDENT + "f = %g, Q = %g, real pole"
+                    % (frequency, quality_factor)
+                )
                                                             # configuration file
 if verbose :
     print(INDENT + "writing template %s" % yaml_file_spec)
@@ -172,7 +178,7 @@ for index in range(len(highpass_frequencies)) :
     configuration_file.write(INDENT + "highpass%d:\n" % (index+1))
     configuration_file.write(2*INDENT + "type: Biquad\n")
     configuration_file.write(2*INDENT + "parameters:\n")
-    configuration_file.write(3*INDENT + "type: Lowpass\n")
+    configuration_file.write(3*INDENT + "type: Highpass\n")
     configuration_file.write(
         3*INDENT + "freq: %g\n" % highpass_frequencies[index]
     )
@@ -233,3 +239,16 @@ else :
         print(INDENT + "writing %s" % png_file_spec)
 plt.savefig(png_file_spec)
 plt.clf()
+                                                           # near DC group delay
+DC_group_delay = lowpass_group_delay[0]
+if verbose :
+    print(INDENT + 'low frequency group delay : %g ms' % (1.0E3*DC_group_delay))
+                                                   # low to highpass phase shift
+LF_phase = np.angle(lowpass_h[0])/np.pi*180
+HF_phase = np.angle(highpass_h[-1])/np.pi*180
+if verbose :
+    print(
+        INDENT + 'lowest to highest frequency phase shift : %d°'
+        % abs(LF_phase - HF_phase)
+    )
+
