@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import os
+import subprocess
 import argparse
 import json
 import requests
@@ -8,6 +10,15 @@ import requests
 #
 INDENT = 2*' '
 
+script_path = os.path.dirname(os.path.realpath(__file__))
+script_run = subprocess.Popen(
+    ['bash', script_path+'/clientSource.bash'],
+    stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+)
+snap_server = script_run.communicate()[0].decode()
+snap_server = snap_server[snap_server.find('"')+1:]
+snap_server = snap_server[:snap_server.find('"')]
+
 # ------------------------------------------------------------------------------
 # command line arguments
 #
@@ -15,13 +26,16 @@ INDENT = 2*' '
 parser = argparse.ArgumentParser(
   description='set snapclient volume'
 )
-                                                                # snap client id
-parser.add_argument('client')
                                                                         # volume
-parser.add_argument('volume')
+parser.add_argument('volume', nargs='?')
+                                                                # snap client id
+parser.add_argument(
+    '-c', '--client', default=os.uname().nodename,
+    help = 'client name'
+)
                                                                    # server name
 parser.add_argument(
-    '-s', '--server', default='localhost',
+    '-s', '--server', default=snap_server,
     help = 'server name'
 )
                                                                   # control port
@@ -37,26 +51,35 @@ parser.add_argument(
                                                              # process arguments
 parser_arguments = parser.parse_args()
 
+get_volume = True
+if parser_arguments.volume :
+    volume = int(parser_arguments.volume)
+    get_volume = False
+
 client_id = parser_arguments.client
-volume = int(parser_arguments.volume)
-sanp_server_name = parser_arguments.server
-sanp_server_port = parser_arguments.port
+snap_server_name = parser_arguments.server
+snap_server_port = parser_arguments.port
 verbose = parser_arguments.verbose
 
 # ------------------------------------------------------------------------------
 # Main
 #
                                                         # basic request elements
-url = "http://%s:%d/jsonrpc" % (sanp_server_name, sanp_server_port)
+url = "http://%s:%d/jsonrpc" % (snap_server_name, snap_server_port)
 request_id = 0
 payload = {'jsonrpc': '2.0', 'id': request_id}
                                                                     # set method
-payload['method'] = 'Client.SetVolume'
-parameters = {}
-parameters['id'] = client_id
-parameters['volume'] = {'muted':False, 'percent':volume}
-if volume == 0 :
-    parameters['volume'] = {'muted':True}
+if get_volume :
+    payload['method'] = 'Client.GetStatus'
+    parameters = {}
+    parameters['id'] = client_id
+else :
+    payload['method'] = 'Client.SetVolume'
+    parameters = {}
+    parameters['id'] = client_id
+    parameters['volume'] = {'muted':False, 'percent':volume}
+    if volume == 0 :
+        parameters['volume'] = {'muted':True}
 payload['params'] = parameters
                                                                   # send request
 response = requests.post(url, data=json.dumps(payload)).json()
@@ -66,9 +89,16 @@ if 'error' in response :
     search_for_id = True
                                                                     # print info
 else :
+    sub_response = response['result']
+    if get_volume :
+        sub_response = sub_response['client']['config']
+    muted = sub_response['volume']['muted']
+    volume = sub_response['volume']['percent']
     if verbose :
-        print("muted  : %s" % response['result']['volume']['muted'])
-        print("volume : %s%%" % response['result']['volume']['percent'])
+        print("muted  : %s" % muted)
+        print("volume : %s%%" % volume)
+    elif get_volume :
+        print(volume)
                                                                  # search for id
 if search_for_id :
     if verbose :
@@ -95,9 +125,14 @@ if search_for_id :
                 (client_name, client_id)
             )
                                                                     # set method
-        payload['method'] = 'Client.SetVolume'
-        parameters['id'] = client_id
-        payload['params'] = parameters
+        if get_volume :
+            payload['method'] = 'Client.GetStatus'
+            parameters['id'] = client_id
+            payload['params'] = parameters
+        else :
+            payload['method'] = 'Client.SetVolume'
+            parameters['id'] = client_id
+            payload['params'] = parameters
                                                                   # send request
         response = requests.post(url, data=json.dumps(payload)).json()
         request_id = request_id + 1
@@ -105,15 +140,16 @@ if search_for_id :
             print("error")
                                                                     # print info
         else :
+            sub_response = response['result']
+            if get_volume :
+                sub_response = sub_response['client']['config']
+            muted = sub_response['volume']['muted']
+            volume = sub_response['volume']['percent']
             if verbose :
-                print(
-                    2*INDENT + "muted  : %s" %
-                    response['result']['volume']['muted']
-                )
-                print(
-                    2*INDENT + "volume : %s%%" %
-                    response['result']['volume']['percent']
-                )
+                print(2*INDENT + "muted  : %s" % muted)
+                print(2*INDENT + "volume : %s%%" % volume)
+            elif get_volume :
+                print(volume)
     else :
         if verbose :
             print("client not found")

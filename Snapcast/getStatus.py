@@ -53,7 +53,11 @@ payload = {'jsonrpc': '2.0', 'id': request_id}
                                                                     # set method
 payload['method'] = 'Server.GetStatus'
                                                                   # send request
-response = requests.post(url, data=json.dumps(payload)).json()
+try :
+    response = requests.post(url, data=json.dumps(payload)).json()
+except :
+    print("No response from SnapServer on %s" % snap_server_name)
+    quit()
 request_id = request_id + 1
                                                                  # print results
 print('Clients:')
