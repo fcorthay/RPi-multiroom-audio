@@ -37,10 +37,10 @@ mixers:
       - dest: 1
         sources:
           - channel: 0
-            gain: -40
+            gain: -6
             inverted: false
           - channel: 1
-            gain: -40
+            gain: -6
             inverted: false
 
 pipeline:
