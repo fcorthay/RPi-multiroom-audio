@@ -21,7 +21,7 @@ devices:
     format: S32LE
 
 mixers:
-  stereoToLeft:
+  stereoToRight:
     channels:
       in: 2
       out: 2
@@ -45,4 +45,4 @@ mixers:
 
 pipeline:
   - type: Mixer
-    name: stereoToLeft
+    name: stereoToRight
