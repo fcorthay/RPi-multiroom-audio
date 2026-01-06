@@ -70,4 +70,3 @@ if set_volume :
     camillaDSP_client.volume.set_main_volume(volume)
                                                      # disconnect from websocket
 camillaDSP_client.disconnect()
-sys.exit()
