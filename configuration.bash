@@ -4,7 +4,7 @@
 export AUDIO_BASE_DIR=$(dirname "${BASH_SOURCE[0]}")
 
 # multiroom environment
-export MULTIROOM_SNAPCAST_SERVER='Persephone.local'
+export MULTIROOM_SNAPCAST_SERVER='Lachesis.local'
 
 # from installation
 export AMPLIFIER_SOUNDCARD=sndrpijustboomd

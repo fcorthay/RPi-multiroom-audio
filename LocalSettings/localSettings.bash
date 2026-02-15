@@ -6,7 +6,6 @@ BACKUP_DIRECTORY="$BASE_DIRECTORY/LocalSettings"
 LOCAL_FILES=(
   'configuration.bash'
   'Management/localSettings.bash'
-  'CamillaDSP/Configuration/camillaconfig.yaml'
 )
 INDENT='  '
                                                                   # check action

@@ -57,9 +57,11 @@ fi
 audioOutputFull=`cat $CONFIGURATION_FILE | grep ^output`
 audioOutput=`echo $audioOutputFull | grep ^output | sed 's/.*device=//'`
 audioOutput=`echo $audioOutput | sed 's/.*location=//'`
-echo "Mopidy sink is \"$audioOutput\""
 if [ $verbose = 'true' ] ; then
+  echo "Mopidy sink is \"$audioOutput\""
   echo "${INDENT}$audioOutputFull"
+else
+  echo $audioOutput
 fi
 if [ -z $newSink ] ; then
   exit

@@ -58,9 +58,11 @@ audioInputFull=`cat $CONFIGURATION_FILE | grep ^SNAPCLIENT_OPTS=`
 audioInput=`echo $audioInputFull | sed 's/.*--host\s*//'`
 audioInput=`echo $audioInput | sed 's/\s.*//'`
 audioInput=`echo $audioInput | sed 's/"//'`
-echo "Snapclient source is \"$audioInput\""
 if [ $verbose = 'true' ] ; then
+  echo "Snapclient source is \"$audioInput\""
   echo "${INDENT}$audioInputFull"
+else
+  echo $audioInput
 fi
 if [ -z $newSource ] ; then
   exit

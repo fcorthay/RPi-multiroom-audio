@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import os
+import sys
+import subprocess
 import argparse
 import json
 import requests
@@ -11,6 +14,12 @@ INDENT = 2*' '
 # ------------------------------------------------------------------------------
 # command line arguments
 #
+script_directory = os.path.dirname(os.path.realpath(sys.argv[0]))
+default_server = subprocess.check_output([
+    os.path.join(script_directory, 'clientSource.bash')
+]).decode('ascii').rstrip('\n')
+default_client = subprocess.check_output(['hostname'])\
+    .decode('ascii').rstrip('\n')
                                                              # specify arguments
 parser = argparse.ArgumentParser(
   description='set snapclient volume'
@@ -22,7 +31,7 @@ parser.add_argument(
 )
                                                                    # server name
 parser.add_argument(
-    '-s', '--server', default='localhost',
+    '-s', '--server', default=default_server,
     help = 'server name'
 )
                                                                   # control port
@@ -32,7 +41,7 @@ parser.add_argument(
 )
                                                                 # snap client id
 parser.add_argument(
-    '-c', '--client', default='00:00:00:00:00:00',
+    '-c', '--client', default=default_client,
     help = 'Snap client id'
 )
                                                                 # verbose output
@@ -72,6 +81,8 @@ for group_info in groups_info :
             client_id = client_info_id
                                                                     # set method
 if volume :
+    if verbose :
+        print("Setting volume of %s to %s%%" %(snap_server_name, volume))
     payload['method'] = 'Client.SetVolume'
     parameters = {}
     parameters['id'] = client_id
@@ -80,6 +91,8 @@ if volume :
         parameters['volume'] = {'muted':True}
     payload['params'] = parameters
 else :
+    if verbose :
+        print("Getting volume from %s for %s" %(snap_server_name, client_id))
     payload['method'] = 'Client.GetStatus'
     parameters = {}
     parameters['id'] = client_id
@@ -108,6 +121,8 @@ else :
         status = response['result']['client']['config']
     status_muted = status['volume']['muted']
     status_volume = status['volume']['percent']
-    if verbose or (not volume) :
-        print("muted  : %s" % status_muted)
-        print("volume : %s%%" % status_volume)
+    if verbose :
+        print(INDENT + "muted  : %s" % status_muted)
+        print(INDENT + "volume : %s%%" % status_volume)
+    elif not volume :
+        print(status_volume)

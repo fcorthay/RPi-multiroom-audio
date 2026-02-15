@@ -1,4 +1,6 @@
 *.pyc
-LocalSettings/*
-Crossovers/*.yaml
+LocalSettings
 LoudspeakerTest/Batch
+CamillaDSP/Backend
+CamillaDSP/Configuration/Configurations
+Crossovers/*.yaml

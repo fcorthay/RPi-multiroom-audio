@@ -7,110 +7,84 @@ INDENT='  '
 # ------------------------------------------------------------------------------
 # Functions
 #
-function serviceActivity {
-  activity=`sudo service $1 status | grep -E "^ +Active"`
-  activity=`echo $activity | sed 's/.*Active:\s//'`
-  activity=`echo $activity | tr ')' '_' | sed 's/_.*/)/'`
-  echo $activity
+function serviceSourceSink {
+  for path in ${streamList[@]} ; do
+    if [[ $path == $1*$2 ]] ; then
+      sourceSink=`echo $path | cut -d ' ' -f 2`
+      card=''
+      for cardName in ${cardList[@]} ; do
+        if [ ${sourceSink:1:1} = ${cardName:0:1} ]; then
+          card=${cardName:2}
+          device=${sourceSink:3:1}
+        fi
+      done
+      echo "$card $device"
+    fi
+  done
+}
+
+function serviceSource {
+#  serviceSourceSink $1 'c'
+#  echo 'hello'
+  echo $(serviceSourceSink $1 'c')
 }
 
 function serviceSink {
-  sink=`$AUDIO_BASE_DIR/$1 | tr -d '"'`
-  sink=`echo $sink | sed 's/.*is\s*//'`
-  echo $sink
+  echo $(serviceSourceSink $1 'p')
 }
 
 # ------------------------------------------------------------------------------
 # Main script
 #
-                                                            # Check for services
-serviceList=''
+                                                                 # get card list
+IFS=$'\n' cardList=(`aplay -l | grep ^card | tr -d ':' | cut -d ' ' -f 2,3`)
+                                                             # get audio streams
+streamList=''
 reply=`sudo -nv 2>&1`
 if [[ $reply != Sorry* ]] ; then
-  echo -e "Checking for services\n"
-  serviceList=`systemctl list-unit-files --type=service`
+  echo "Checking for audio streams"
+  IFS=$'\n' streamList=(`\
+    sudo lsof +c 15 /dev/snd/* \
+      | grep /dev/snd/pcm | sed 's/\/dev\/snd\/pcm//' | sed 's/0t0//' \
+      | tr -s ' ' | cut -d ' ' -f 1,8 | uniq \
+  `)
+  echo
 fi
                                                                         # Mopidy
-echo 'Mopidy'
 service='mopidy'
-if [ -n "$serviceList" ] ; then
-  serviceExists=`echo $serviceList | grep $service`
-  if [ -z "$serviceExists" ] ; then
-    echo "${INDENT}service not installed"
-  else
-    echo "${INDENT}$(serviceActivity $service)"
-  fi
+sinkDevice=$(serviceSink $service)
+if [ -n "$sinkDevice" ] ; then
+  echo 'Mopidy player'
+  sinkDevice=`$AUDIO_BASE_DIR/Mopidy/mopidySink.bash`
+  echo "${INDENT}files -> mopidy -> $sinkDevice"
 fi
-if [ -f /etc/mopidy/mopidy.conf ] ; then
-  echo "${INDENT}files -> mopidy -> $(serviceSink Mopidy/mopidySink.bash)"
-fi
+echo
                                                                     # snapserver
-echo 'Snapcast server'
 service='snapserver'
-if [ -n "$serviceList" ] ; then
-  serviceExists=`echo $serviceList | grep $service`
-  if [ -z "$serviceExists" ] ; then
-    echo "${INDENT}service not installed"
-  else
-    echo "${INDENT}$(serviceActivity $service)"
-  fi
+sourceDevice=$(serviceSource $service)
+if [ -n "$sourceDevice" ] ; then
+  echo 'Snapcast server'
+  sourceDevice=`$AUDIO_BASE_DIR/Snapcast/serverSource.bash`
+  echo "$INDENT$sourceDevice -> snapServer -> Ethernet"
 fi
-if [ -f /etc/snapserver.conf ] ; then
-  echo "${INDENT}$(serviceSink Snapcast/serverSource.bash)" \
-    "-> snapserver -> Ethernet"
-fi
+echo
                                                                     # snapclient
-echo 'Snapcast client'
 service='snapclient'
-if [ -n "$serviceList" ] ; then
-  serviceExists=`echo $serviceList | grep $service`
-  if [ -z "$serviceExists" ] ; then
-    echo "${INDENT}service not installed"
-  else
-    echo "${INDENT}$(serviceActivity $service)"
-    audioInput=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
-    audioInput=`echo $audioInput | sed 's/.*--host\s*//'`
-    audioInput=`echo $audioInput | sed 's/\s.*//'`
-    audioInput=`echo $audioInput | sed 's/"//'`
-  fi
+sinkDevice=$(serviceSink $service)
+if [ -n "$sinkDevice" ] ; then
+  echo 'Snapcast client'
+  host=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
+  host=`echo $host | sed 's/.*--host\s*//'`
+  host=`echo $host | sed 's/\s.*//'`
+  host=`echo $host | sed 's/".*//'`
+  sinkDevice=`$AUDIO_BASE_DIR/Mopidy/mopidySink.bash`
+  echo "${INDENT}Ethernet:$host -> snapclient -> $sinkDevice"
 fi
-if [ -f /etc/default/snapclient ] ; then
-  echo "${INDENT}Ethernet $audioInput -> snapclient" \
-    "-> $(serviceSink Snapcast/clientSink.bash)"
-fi
+echo
                                                                     # camilladsp
-echo 'CamillaDSP'
 service='camilladsp'
-if [ -n "$serviceList" ] ; then
-  serviceExists=`echo $serviceList | grep $service`
-  if [ -z "$serviceExists" ] ; then
-    echo "${INDENT}service not installed"
-  else
-    echo "${INDENT}$(serviceActivity $service)"
-  fi
-fi
-if [ -z "$CAMILLA_CONFIGURATION_FILE" ] ; then
-  source $AUDIO_BASE_DIR/configuration.bash
-fi
-if [ -f $CAMILLA_CONFIGURATION_FILE ] ; then
-  audioInput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 capture | grep device`
-  audioInput=`echo $audioInput | sed 's/ *device: "//'`
-  audioInput=`echo $audioInput | sed 's/".*//'`
-  audioOutput=`cat $CAMILLA_CONFIGURATION_FILE | grep -A 4 playback`
-  audioOutput=`echo -e "$audioOutput" | grep device`
-  audioOutput=`echo $audioOutput | sed 's/ *device: "//'`
-  audioOutput=`echo $audioOutput | sed 's/".*//'`
-  echo "${INDENT}$audioInput -> CamillaDSP -> $audioOutput"
-fi
-                                                                      # alsaloop
-alsaloopCommand=`ps ax | grep -v grep | grep alsaloop`
-if [ -n "$alsaloopCommand" ] ; then
-  echo "Alsaloop"
-  audioInput=`echo $alsaloopCommand | sed 's/.*-C *//'`
-  audioInput=`echo $audioInput | sed 's/ .*//'`
-  audioInput=`echo $audioInput | sed 's/.*\://'`
-  audioOutput=`echo $alsaloopCommand | sed 's/.*-P *//'`
-  audioOutput=`echo $audioOutput | sed 's/ .*//'`
-  audioOutput=`echo $audioOutput | sed 's/.*\://'`
-  echo "${INDENT}$audioInput -> alsaloop -> $audioOutput"
+sourceDevice=$(serviceSource $service)
+if [ -n "$sourceDevice" ] ; then
+  echo 'CamillaDSP'
+  echo "$INDENT$sourceDevice -> CamillaDSP -> "
 fi

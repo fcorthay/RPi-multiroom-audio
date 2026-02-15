@@ -63,9 +63,11 @@ audioInput=`echo $audioInputFull | sed 's/^source\s*=\s*//'`
   if [[ "$audioInput" =~ ^alsa.* ]]; then
     audioInput=`echo $audioInput | sed 's/.*device=//'`
   fi
-echo "Snapserver source is \"$audioInput\""
 if [ $verbose = 'true' ] ; then
+  echo "Snapserver source is \"$audioInput\""
   echo "${INDENT}$audioInputFull"
+else
+  echo $audioInput
 fi
 if [ -z $newSource ] ; then
   exit

@@ -24,25 +24,13 @@ function serviceActivity {
                                                                         # Mopidy
 service='mopidy'
 if [ "$(serviceActivity $service)" = 'active' ]; then
-  requestData='{"jsonrpc": "2.0", "id": 1, "method": "core.mixer.get_volume"}'
-  requestHeader='Content-Type: application/json'
-  requestURL="http://$MOPIDY_SERVER:$MOPIDY_PORT/mopidy/rpc"
-  volume=`curl -s -d "$requestData" -H "$requestHeader" "$requestURL"`
-  volume=`echo $volume | sed 's/.*"result":\s*//'`
-  volume=`echo $volume | sed 's/}//'`
-  volume=`echo $volume | sed 's/,.*//'`
+  volume=`$AUDIO_BASE_DIR/Mopidy/volume.bash`
   echo "Mopidy     : $volume%"
 fi
                                                                     # snapserver
 service='snapclient'
 if [ "$(serviceActivity $service)" = 'active' ]; then
-  snapServer=`cat /etc/default/snapclient | grep ^SNAPCLIENT_OPTS=`
-  snapServer=`echo $snapServer | sed 's/.*--host\s*//'`
-  snapServer=`echo $snapServer | sed 's/\s.*//'`
-  snapServer=`echo $snapServer | sed 's/"//'`
-  snapClient=`hostname`
-  volume=`$AUDIO_BASE_DIR/Snapcast/setVolume.py -s $snapServer -c $snapClient`
-  volume=`echo $volume | sed 's/.*volume\s*:\s*//'`
+  volume=`$AUDIO_BASE_DIR/Snapcast/volume.py`
   echo "Snapcast   : $volume"
 fi
                                                                     # camilladsp
