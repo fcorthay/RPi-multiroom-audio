@@ -36,13 +36,9 @@ fi
                                                                     # camilladsp
 service='camilladsp'
 if [ "$(serviceActivity $service)" = 'active' ]; then
-  volume=`$AUDIO_BASE_DIR/CamillaDSP/Scripts/setVolume.py`
-  volume=`echo $volume | sed 's/.*volume\s*//'`
-  volume=`echo $volume | sed 's/.*is\s*//'`
+  volume=`$AUDIO_BASE_DIR/CamillaDSP/Scripts/volume.py`
   echo "CamillaDSP : $volume"
 fi
                                                                           # ALSA
-volume=`amixer -D hw:$AMPLIFIER_SOUNDCARD get Digital`
-volume=`echo $volume | sed 's/.*: Playback\s*//'`
-volume=`echo $volume | sed -r 's/.*\[([0-9]+%)\].*/\1/'`
+volume=`$AUDIO_BASE_DIR/Management/alsaVolume.bash`
 echo "ALSA       : $volume"

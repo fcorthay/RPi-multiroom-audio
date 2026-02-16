@@ -62,8 +62,10 @@ camillaDSP_client = CamillaClient(server_name, control_port)
 camillaDSP_client.connect()
                                                                     # get volume
 current_volume = camillaDSP_client.volume.main_volume()
-if verbose or (not set_volume):
+if verbose :
     print("Current volume is %g dB" % current_volume)
+elif not set_volume :
+    print(current_volume)
                                                                     # set volume
 if set_volume :
     print("Setting volume to %g dB" % volume)

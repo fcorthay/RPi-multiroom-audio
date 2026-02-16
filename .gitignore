@@ -1,6 +1,7 @@
 *.pyc
-LocalSettings
-LoudspeakerTest/Batch
+configuration.bash
 CamillaDSP/Backend
 CamillaDSP/Configuration
+LoudspeakerTest/Batch
 Crossovers/*.yaml
+LocalSettings
