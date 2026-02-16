@@ -1,1 +1,0 @@
-ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="20b1", RUN+="/bin/systemctl --no-block start camilladsp"
