@@ -4,7 +4,10 @@
 # alsamixer -D hw:$AMPLIFIER_SOUNDCARD
 # amixer -D hw:$AMPLIFIER_SOUNDCARD scontrols
 
-AMIXER_VOLUME_CONTROL='Digital'
+AMIXER_VOLUME_CONTROL=$VOLUME_CONTROL
+if [ -z "$AMIXER_VOLUME_CONTROL" ] ; then
+  AMIXER_VOLUME_CONTROL='Digital'
+fi
                                                                     # set volume
 if [[ $1 != '' ]] ; then
   amixer -D hw:$AMPLIFIER_SOUNDCARD sset $AMIXER_VOLUME_CONTROL $1%
