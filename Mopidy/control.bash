@@ -16,10 +16,11 @@ verbose=false
                                                              # specify arguments
 arguments='s:vh'
 declare -A longArguments
-longArguments=(["s"]="server" ["v"]="verbose")
+longArguments=(["s"]="server" ["v"]="verbose" ["h"]="help")
                                                              # show script usage
 usage() {
-  echo "Usage: $(basename "$0") [-v|--verbose] server" 1>&2 
+  echo "Usage: $(basename "$0") [-v|--verbose] [-s|--server hostname] command"\
+    1>&2 
   exit
 }
                                                         # replace long arguments
