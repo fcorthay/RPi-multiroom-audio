@@ -1,0 +1,14 @@
+[Unit]
+Description=BlueALSA player bridge to ALSA loopback
+After=bluealsa.service alsaloop-bridge.service
+Requires=bluealsa.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/bluealsa-aplay -D plug:dmix:Loopback,0,1 --pcm-buffer-time=5000000
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+
