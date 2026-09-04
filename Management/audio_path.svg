@@ -9,7 +9,7 @@
    id="svg8"
    inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
    sodipodi:docname="audio_path.svg"
-   inkscape:export-filename="audio_path-bluetooth.png"
+   inkscape:export-filename="audio_path-USB.png"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -28,11 +28,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.032807"
-     inkscape:cx="245.61056"
+     inkscape:zoom="2.9466228"
+     inkscape:cx="245.70501"
      inkscape:cy="179.52756"
      inkscape:document-units="mm"
-     inkscape:current-layer="g106"
+     inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:object-paths="true"
      inkscape:snap-smooth-nodes="true"
@@ -42,11 +42,11 @@
      inkscape:showpageshadow="2"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:window-width="3072"
-     inkscape:window-height="1659"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-width="2481"
+     inkscape:window-height="1269"
+     inkscape:window-x="26"
+     inkscape:window-y="23"
+     inkscape:window-maximized="0"
      inkscape:export-bgcolor="#ffffffff">
     <inkscape:grid
        type="xygrid"
@@ -55,7 +55,7 @@
        spacingx="0.25"
        spacingy="0.25"
        empspacing="4"
-       enabled="false"
+       enabled="true"
        originx="0"
        originy="0" />
     <inkscape:grid
@@ -84,7 +84,6 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1457,6 +1456,26 @@
            inkscape:connector-curvature="0" />
       </g>
     </g>
+    <rect
+       y="266"
+       x="18"
+       height="1.9999994"
+       width="2.0000005"
+       id="rect1097-7-7"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       id="rect1097-7-7-2"
+       style="display:inline;fill:none;stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
+       d="M 9.9999999,266.75 12,266.75 v 0.5 l -2.0000001,0"
+       sodipodi:nodetypes="cccc" />
+    <rect
+       y="265"
+       x="12"
+       height="4.0000005"
+       width="5.9999995"
+       id="rect1097-7-7-7"
+       style="display:inline;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       ry="0.9999994" />
     <path
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        d="m 117,243 h 7 v 48 H 5.9999998 V 218 H 13"
@@ -1507,13 +1526,35 @@
          id="path1861-3"
          inkscape:connector-curvature="0" />
     </g>
+    <path
+       d="m 16.862121,267.0001 -0.413718,-0.23892 v 0.17043 h -2.114624 l 0.411741,-0.435 c 0.03504,-0.0281 0.08089,-0.0478 0.12805,-0.0489 0.19079,0 0.304089,-6e-5 0.345794,-1.3e-4 0.02827,0.0805 0.104205,0.13868 0.194477,0.13868 0.114201,0 0.20688,-0.0927 0.20688,-0.20691 0,-0.1143 -0.09267,-0.20693 -0.20688,-0.20693 -0.09027,0 -0.166208,0.0581 -0.194477,0.13857 l -0.341742,-6e-5 c -0.09262,0 -0.189673,0.0508 -0.251446,0.11039 0.0017,-0.002 0.0034,-0.003 -9.9e-5,3e-5 -0.0013,0.002 -0.436844,0.46148 -0.436844,0.46148 -0.03497,0.028 -0.08079,0.0476 -0.127918,0.0487 h -0.239216 c -0.03171,-0.15803 -0.17126,-0.27709 -0.338659,-0.27709 -0.190855,0 -0.345562,0.15471 -0.345562,0.3455 0,0.19086 0.154707,0.34557 0.345562,0.34557 0.167432,0 0.306983,-0.11916 0.338692,-0.27732 h 0.235024 c 6e-4,0 0.0012,3e-5 0.0018,0 h 0.519833 c 0.04704,10e-4 0.0928,0.0208 0.127735,0.0489 0,0 0.435438,0.45997 0.436786,0.46146 0.0035,0.003 0.0017,0.002 3.5e-5,3e-5 0.06177,0.0596 0.158865,0.11035 0.251503,0.11035 l 0.32934,-6e-5 v 0.13871 h 0.413823 v -0.41379 h -0.413825 v 0.13854 c 0,0 -0.08674,-1.3e-4 -0.333375,-1.3e-4 -0.04717,-0.001 -0.09307,-0.0207 -0.128091,-0.0488 l -0.411832,-0.43509 h 1.597496 v 0.17071 z"
+       id="path1334"
+       style="stroke-width:0.0082682" />
+    <g
+       id="g5"
+       transform="translate(0,-0.12500029)">
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect4"
+         width="0.24999963"
+         height="0.37500033"
+         x="18.75"
+         y="266.625" />
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.25;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
+         id="rect5"
+         width="0.25000039"
+         height="0.37499967"
+         x="18.75"
+         y="267.25" />
+    </g>
   </g>
   <g
      inkscape:label="Bluetooth"
      inkscape:groupmode="layer"
      id="g106"
      transform="translate(0,-202)"
-     style="display:inline">
+     style="display:none">
     <g
        id="g46"
        transform="translate(1.8020643e-6,190)">
@@ -1544,7 +1585,7 @@
        sodipodi:nodetypes="cccc"
        inkscape:connector-curvature="0"
        id="path48"
-       d="m 52.000001,267 h 2 l 0,-18 2,-2"
+       d="m 52.000001,267 h 2 v -18 l 2,-2"
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.499999;stroke-linecap:round;stroke-linejoin:round"
@@ -1562,5 +1603,44 @@
        x="11"
        y="258"
        ry="0.99999946" />
+  </g>
+  <g
+     inkscape:label="USB"
+     inkscape:groupmode="layer"
+     id="g4"
+     transform="translate(0,-202)"
+     style="display:inline">
+    <g
+       id="g1"
+       transform="translate(1.8020643e-6,190)">
+      <text
+         id="text1"
+         y="78"
+         x="40"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:1;font-family:Dosis;-inkscape-font-specification:Dosis;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         xml:space="preserve"><tspan
+           style="font-size:4.23333px;stroke-width:0.264583"
+           y="78"
+           x="40"
+           id="tspan1"
+           sodipodi:role="line">USB</tspan></text>
+      <path
+         inkscape:connector-curvature="0"
+         id="path1"
+         d="M 39.999999,67.000002 30,77 39.999999,87.000002 C 39.999999,87.000002 50,77 50,77 Z"
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path2"
+       d="m 55.171576,246.41421 0.707106,0.70711 0.707106,0.70711 L 58.000001,245 Z"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       id="path3"
+       d="m 52.000001,267 h 2 l 0,-18 2,-2"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   </g>
 </svg>
