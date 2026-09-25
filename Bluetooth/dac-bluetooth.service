@@ -5,10 +5,9 @@ Requires=bluealsa.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/bluealsa-aplay -D plug:dmix:Loopback,0,1 --pcm-buffer-time=5000000
+ExecStart=/usr/bin/bluealsa-aplay -D bluetooth_to_loopback --pcm-buffer-time=5000000
 Restart=on-failure
 RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
-
